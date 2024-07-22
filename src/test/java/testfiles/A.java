@@ -1,0 +1,20 @@
+package testfiles;
+
+public class A {
+    public static void main(String[] args) {
+        calculate(0);
+    }
+    public static int calculate(int a) {
+        int x = B.x();
+
+        new C().x();
+
+        if(x>5) {
+            assert a > 10;
+        }
+
+        "".equals("dsa");
+
+        return x+1;
+    }
+}
