@@ -9,9 +9,9 @@ public class CliUtils {
 
     public static Options getOptions() {
         return new Options()
-                .addOption("s", "src", true, "location of source file")
-                .addOption("c", "class", true, "location of class file")
-                .addOption("m", "method", true, "method to be analyzed")
+                .addOption("s", "sourcepath", true, "sourcepath")
+                .addOption("c", "classpath", true, "classpath")
+                .addOption("m", "method", true, "fully specified methodname, like org.example.A.method1")
                 .addOption("o", "output", true, "output file");
     }
 
