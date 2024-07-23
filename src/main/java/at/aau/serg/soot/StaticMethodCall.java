@@ -7,8 +7,10 @@ import java.util.Objects;
 public class StaticMethodCall {
     private String methodName;
     private PrimitiveType returnType;
+    private String className;
 
-    public StaticMethodCall(String methodName, PrimitiveType returnType) {
+    public StaticMethodCall(String className, String methodName, PrimitiveType returnType) {
+        this.className = className;
         this.methodName = methodName;
         this.returnType = returnType;
     }

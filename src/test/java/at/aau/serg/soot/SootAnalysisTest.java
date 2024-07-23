@@ -19,6 +19,6 @@ public class SootAnalysisTest {
 
         assertEquals(1, calls.size());
         StaticMethodCall call = calls.iterator().next();
-        assertEquals(new StaticMethodCall("x", PrimitiveType.getInt()), call);
+        assertEquals(new StaticMethodCall("B", "x", PrimitiveType.getInt()), call);
     }
 }

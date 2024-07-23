@@ -63,7 +63,7 @@ public class SootAnalysis {
             if(!PrimitiveType.isIntLikeType(method.getReturnType()))
                 throw new RuntimeException("Method " + method.getName() + " is not int-like type");
 
-            staticMethodCalls.add(new StaticMethodCall(method.getName(), (PrimitiveType) method.getReturnType()));
+            staticMethodCalls.add(new StaticMethodCall(method.getDeclaringClassType().getClassName(), method.getName(), (PrimitiveType) method.getReturnType()));
         }
 
         return staticMethodCalls;
