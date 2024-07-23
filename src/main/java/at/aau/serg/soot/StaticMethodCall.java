@@ -1,5 +1,6 @@
 package at.aau.serg.soot;
 
+import com.github.javaparser.ast.type.Type;
 import sootup.core.types.PrimitiveType;
 
 import java.util.Objects;
@@ -34,5 +35,39 @@ public class StaticMethodCall {
                 "methodName='" + methodName + '\'' +
                 ", returnType=" + returnType +
                 '}';
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public PrimitiveType getReturnType() {
+        return returnType;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public Type getReturnTypeAsJavaParserType() {
+        switch (returnType.getName()) {
+            case "boolean":
+                return com.github.javaparser.ast.type.PrimitiveType.booleanType();
+            case "byte":
+                return com.github.javaparser.ast.type.PrimitiveType.byteType();
+            case "char":
+                return com.github.javaparser.ast.type.PrimitiveType.charType();
+            case "short":
+                return com.github.javaparser.ast.type.PrimitiveType.shortType();
+            case "int":
+                return com.github.javaparser.ast.type.PrimitiveType.intType();
+            case "long":
+                return com.github.javaparser.ast.type.PrimitiveType.longType();
+            case "float":
+                return com.github.javaparser.ast.type.PrimitiveType.floatType();
+            case "double":
+                return com.github.javaparser.ast.type.PrimitiveType.doubleType();
+        }
+        return null;
     }
 }
