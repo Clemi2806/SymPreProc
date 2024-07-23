@@ -19,18 +19,11 @@ import sootup.java.core.views.JavaView;
 import java.util.*;
 
 public class SootAnalysis {
-    private String classPath;
-    private String methodName;
-    private String classIdentifier;
     private JavaView view;
     private JavaSootMethod javaSootMethod;
     private CallGraph callGraph;
 
     public SootAnalysis(String classPath, String classIdentifier, String methodName) {
-        this.classPath = classPath;
-        this.methodName = methodName;
-        this.classIdentifier = classIdentifier;
-
         List<AnalysisInputLocation> inputLocations = new ArrayList<>();
         inputLocations.add(new JavaClassPathAnalysisInputLocation(classPath));
         inputLocations.add(new DefaultRTJarAnalysisInputLocation());
