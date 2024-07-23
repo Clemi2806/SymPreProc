@@ -24,6 +24,7 @@ public class SootAnalysis {
     private String classIdentifier;
     private JavaView view;
     private JavaSootMethod javaSootMethod;
+    private CallGraph callGraph;
 
     public SootAnalysis(String classPath, String classIdentifier, String methodName) {
         this.classPath = classPath;
@@ -42,11 +43,11 @@ public class SootAnalysis {
         }
         // TODO: Specify method using full signature, to filter out overloaded methods
         javaSootMethod = (JavaSootMethod) class_.get().getMethodsByName(methodName).toArray()[0];
+
+        callGraph = getCallGraph();
     }
 
     public Set<StaticMethodCall> getStaticMethodCalls() {
-        CallGraph callGraph = getCallGraph();
-
         Set<StaticMethodCall> staticMethodCalls = new HashSet<>();
 
         for (MethodSignature methodSignature : callGraph.callsFrom(javaSootMethod.getSignature())) {
@@ -69,7 +70,7 @@ public class SootAnalysis {
         return staticMethodCalls;
     }
 
-    public CallGraph getCallGraph() {
+    private CallGraph getCallGraph() {
 
         MethodSignature entryMethodSignature = javaSootMethod.getSignature();
 
