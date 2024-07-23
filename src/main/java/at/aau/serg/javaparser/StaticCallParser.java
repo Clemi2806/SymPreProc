@@ -44,7 +44,14 @@ public class StaticCallParser implements MethodParser<StaticMethodCall>{
         CompilationUnit cu = ocu.get();
         cu.findAll(MethodCallExpr.class).forEach(callExpr -> {
             if(callExpr.getName().equals(method.getName())) {
-                callExpr.replace(new MethodCallExpr(callExpr.getScope().orElse(null), callExpr.getNameAsString(), new NodeList<Expression>(method.getParameters().stream().map(StaticCallParser::convertParameter).collect(Collectors.toList()))));
+                callExpr.replace(
+                        new MethodCallExpr(
+                                callExpr.getScope().orElse(null),
+                                callExpr.getNameAsString(),
+                                new NodeList<Expression>(
+                                        method.getParameters()
+                                                .stream().map(StaticCallParser::convertParameter)
+                                                .collect(Collectors.toList()))));
             }
         });
     }
@@ -54,17 +61,14 @@ public class StaticCallParser implements MethodParser<StaticMethodCall>{
             case "boolean":
                 return new BooleanLiteralExpr(true);
             case "byte":
-                return new IntegerLiteralExpr(1);
             case "short":
-                return new IntegerLiteralExpr(1);
             case "int":
-                return new IntegerLiteralExpr(1);
+                return new IntegerLiteralExpr("1");
             case "long":
-                return new LongLiteralExpr(1);
+                return new LongLiteralExpr("1");
             case "float":
-                return new DoubleLiteralExpr(1);
             case "double":
-                return new DoubleLiteralExpr(1);
+                return new DoubleLiteralExpr("1");
             case "char":
                 return new StringLiteralExpr("1");
         }
