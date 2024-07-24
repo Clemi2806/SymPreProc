@@ -8,6 +8,8 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.type.PrimitiveType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +35,7 @@ public class StaticCallParser implements MethodParser<StaticMethodCall>{
                 if (callExpr.getScope().isPresent() && callExpr.getScope().get().toString().equals(call.getClassName())) {
                     if (callExpr.getNameAsString().equals(call.getMethodName())) {
                         // Jackpot
+                        System.out.printf("Replacing static method call %s%n", call.getCallString());
                         callExpr.replace(new NameExpr(newParameterName));
                     }
                 }

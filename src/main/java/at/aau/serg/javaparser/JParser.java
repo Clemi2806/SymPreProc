@@ -38,6 +38,7 @@ public class JParser {
 
     public void export(String outputPath) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath));
+        System.out.printf("\nExporting new file: \"%s\"%n", outputPath);
         writer.write(compilationUnit.toString());
         writer.flush();
         writer.close();

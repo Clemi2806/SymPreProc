@@ -1,6 +1,8 @@
 package at.aau.serg.soot;
 
 import org.checkerframework.checker.units.qual.A;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sootup.callgraph.CallGraph;
 import sootup.callgraph.CallGraphAlgorithm;
 import sootup.callgraph.ClassHierarchyAnalysisAlgorithm;
@@ -42,6 +44,7 @@ public class SootAnalysis {
             throw new RuntimeException("Could not find class " + classIdentifier);
         }
         // TODO: Specify method using full signature, to filter out overloaded methods
+        System.out.printf("Selecting first method with name: %s%n", methodName);
         javaSootMethod = (JavaSootMethod) class_.get().getMethodsByName(methodName).toArray()[0];
 
         callGraph = getCallGraph();

@@ -48,7 +48,9 @@ public class Main {
         String methodName = methodSpecifier.substring(methodSpecifier.lastIndexOf(".")+1);
         String className = methodSpecifier.substring(0, methodSpecifier.lastIndexOf("."));
 
+        System.out.println("----- Starting analysis -----");
         SootAnalysis analysis = new SootAnalysis(classPath, className, methodName);
+
         StaticCallParser staticCallParser = new StaticCallParser(analysis.getStaticMethodCalls());
 
         JParser jParser;
@@ -58,7 +60,10 @@ public class Main {
             throw new RuntimeException(e);
         }
 
+        System.out.println("----- Parsing static method calls -----");
+
         jParser.parseMethod(staticCallParser);
+
         try {
             jParser.export(outputFile);
         } catch (IOException e) {

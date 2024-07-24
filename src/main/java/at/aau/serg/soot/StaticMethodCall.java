@@ -49,6 +49,10 @@ public class StaticMethodCall {
         return className;
     }
 
+    public String getCallString() {
+        return className + "." + methodName;
+    }
+
     public Type getReturnTypeAsJavaParserType() {
         switch (returnType.getName()) {
             case "boolean":
