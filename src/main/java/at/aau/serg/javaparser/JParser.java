@@ -32,8 +32,8 @@ public class JParser {
 
     }
 
-    public void parseMethod(MethodParser<?> methodParser) {
-        methodParser.parse(method);
+    public void parseMethod(Parser parser) {
+        parser.parse(method);
     }
 
     public void export(String outputPath) throws IOException {

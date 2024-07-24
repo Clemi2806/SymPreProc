@@ -4,6 +4,7 @@ import at.aau.serg.cli.CliUtils;
 import at.aau.serg.javaparser.JParser;
 import at.aau.serg.javaparser.MethodNotFoundException;
 import at.aau.serg.javaparser.StaticCallParser;
+import at.aau.serg.javaparser.StaticVariableParser;
 import at.aau.serg.soot.SootAnalysis;
 import at.aau.serg.soot.StaticMethodCall;
 import org.apache.commons.cli.*;
@@ -53,6 +54,8 @@ public class Main {
 
         StaticCallParser staticCallParser = new StaticCallParser(analysis.getStaticMethodCalls());
 
+        StaticVariableParser staticVariableParser = new StaticVariableParser(analysis.getStaticVariableReferences());
+
         JParser jParser;
         try {
             jParser = new JParser(sourcePath, className, methodName);
@@ -63,6 +66,10 @@ public class Main {
         System.out.println("----- Parsing static method calls -----");
 
         jParser.parseMethod(staticCallParser);
+
+        System.out.println("----- Parsing static variables -----");
+
+        jParser.parseMethod(staticVariableParser);
 
         try {
             jParser.export(outputFile);

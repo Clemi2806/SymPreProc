@@ -1,14 +1,18 @@
 package at.aau.serg.soot;
 
+import sootup.core.types.Type;
+
 import java.util.Objects;
 
 public class StaticVariableReference {
     private String className;
     private String variableName;
+    private Type type;
 
-    public StaticVariableReference(String className, String variableName) {
+    public StaticVariableReference(String className, String variableName, Type type) {
         this.className = className;
         this.variableName = variableName;
+        this.type = type;
     }
 
     public String getClassName() {
@@ -17,6 +21,10 @@ public class StaticVariableReference {
 
     public String getVariableName() {
         return variableName;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     @Override
@@ -38,5 +46,27 @@ public class StaticVariableReference {
     @Override
     public int hashCode() {
         return Objects.hash(className, variableName);
+    }
+
+    public com.github.javaparser.ast.type.Type getReturnTypeAsJavaParserType() {
+        switch (type.toString()) {
+            case "boolean":
+                return com.github.javaparser.ast.type.PrimitiveType.booleanType();
+            case "byte":
+                return com.github.javaparser.ast.type.PrimitiveType.byteType();
+            case "char":
+                return com.github.javaparser.ast.type.PrimitiveType.charType();
+            case "short":
+                return com.github.javaparser.ast.type.PrimitiveType.shortType();
+            case "int":
+                return com.github.javaparser.ast.type.PrimitiveType.intType();
+            case "long":
+                return com.github.javaparser.ast.type.PrimitiveType.longType();
+            case "float":
+                return com.github.javaparser.ast.type.PrimitiveType.floatType();
+            case "double":
+                return com.github.javaparser.ast.type.PrimitiveType.doubleType();
+        }
+        return null;
     }
 }

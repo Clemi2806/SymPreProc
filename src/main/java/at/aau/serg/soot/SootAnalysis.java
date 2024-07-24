@@ -87,7 +87,7 @@ public class SootAnalysis {
                     return !javaSootField.isFinal();
                 })
                 .map(JFieldRef::getFieldSignature)
-                .map(fieldSignature -> new StaticVariableReference(fieldSignature.getDeclClassType().getClassName(), fieldSignature.getName()))
+                .map(fieldSignature -> new StaticVariableReference(fieldSignature.getDeclClassType().getClassName(), fieldSignature.getName(), fieldSignature.getType()))
                 .collect(Collectors.toSet());
     }
 

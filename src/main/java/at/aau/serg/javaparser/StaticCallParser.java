@@ -6,17 +6,12 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.ast.type.PrimitiveType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class StaticCallParser implements MethodParser<StaticMethodCall>{
+public class StaticCallParser extends Parser {
     Set<StaticMethodCall> parsingList;
 
     public StaticCallParser(Set<StaticMethodCall> parsingList) {
@@ -57,24 +52,5 @@ public class StaticCallParser implements MethodParser<StaticMethodCall>{
                                                 .collect(Collectors.toList()))));
             }
         });
-    }
-
-    private static Expression convertParameter(Parameter parameter) {
-        switch (parameter.getType().asPrimitiveType().toString()) {
-            case "boolean":
-                return new BooleanLiteralExpr(true);
-            case "byte":
-            case "short":
-            case "int":
-                return new IntegerLiteralExpr("1");
-            case "long":
-                return new LongLiteralExpr("1");
-            case "float":
-            case "double":
-                return new DoubleLiteralExpr("1");
-            case "char":
-                return new StringLiteralExpr("1");
-        }
-        return null;
     }
 }
