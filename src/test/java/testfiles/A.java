@@ -9,6 +9,8 @@ public class A {
 
         new C().x();
 
+        int z = B.y;
+
         if(x>5) {
             assert a > 10;
         }

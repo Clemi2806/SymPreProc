@@ -12,7 +12,7 @@ public class SootAnalysisTest {
     static final String METHOD_NAME = "calculate";
 
     @Test
-    public void testSootAnalysis() {
+    public void testStaticMethodCalls() {
         SootAnalysis sootAnalysis = new SootAnalysis(CLASS_PATH, CLASS_IDENTIFIER, METHOD_NAME);
 
         Set<StaticMethodCall> calls = sootAnalysis.getStaticMethodCalls();
@@ -20,5 +20,17 @@ public class SootAnalysisTest {
         assertEquals(1, calls.size());
         StaticMethodCall call = calls.iterator().next();
         assertEquals(new StaticMethodCall("B", "x", PrimitiveType.getInt()), call);
+    }
+
+    @Test
+    public void testStaticVariableReferences() {
+        SootAnalysis sootAnalysis = new SootAnalysis(CLASS_PATH, CLASS_IDENTIFIER, METHOD_NAME);
+
+        Set<StaticVariableReference> references = sootAnalysis.getStaticVariableReferences();
+
+        assertEquals(1, references.size());
+        StaticVariableReference expected = new StaticVariableReference("B", "y");
+
+        assertEquals(expected, references.iterator().next());
     }
 }

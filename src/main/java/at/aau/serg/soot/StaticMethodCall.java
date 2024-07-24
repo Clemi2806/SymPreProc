@@ -21,12 +21,12 @@ public class StaticMethodCall {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StaticMethodCall that = (StaticMethodCall) o;
-        return Objects.equals(methodName, that.methodName) && Objects.equals(returnType, that.returnType);
+        return Objects.equals(methodName, that.methodName) && Objects.equals(returnType, that.returnType) && Objects.equals(className, that.className);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(methodName, returnType);
+        return Objects.hash(methodName, returnType, className);
     }
 
     @Override

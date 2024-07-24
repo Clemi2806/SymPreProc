@@ -4,24 +4,31 @@ import org.checkerframework.checker.units.qual.A;
 import sootup.callgraph.CallGraph;
 import sootup.callgraph.CallGraphAlgorithm;
 import sootup.callgraph.ClassHierarchyAnalysisAlgorithm;
+import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.jimple.basic.NoPositionInformation;
+import sootup.core.jimple.common.ref.JFieldRef;
+import sootup.core.jimple.common.ref.JStaticFieldRef;
+import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.types.PrimitiveType;
 import sootup.core.types.VoidType;
 import sootup.java.bytecode.inputlocation.DefaultRTJarAnalysisInputLocation;
 import sootup.java.bytecode.inputlocation.JavaClassPathAnalysisInputLocation;
 import sootup.java.core.JavaSootClass;
+import sootup.java.core.JavaSootField;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 import sootup.java.core.views.JavaView;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SootAnalysis {
     private JavaView view;
     private JavaSootMethod javaSootMethod;
     private CallGraph callGraph;
+    private StmtGraph<?> stmtGraph;
 
     public SootAnalysis(String classPath, String classIdentifier, String methodName) {
         List<AnalysisInputLocation> inputLocations = new ArrayList<>();
@@ -38,6 +45,8 @@ public class SootAnalysis {
         javaSootMethod = (JavaSootMethod) class_.get().getMethodsByName(methodName).toArray()[0];
 
         callGraph = getCallGraph();
+
+        stmtGraph = javaSootMethod.getBody().getStmtGraph();
     }
 
     public Set<StaticMethodCall> getStaticMethodCalls() {
@@ -61,6 +70,22 @@ public class SootAnalysis {
         }
 
         return staticMethodCalls;
+    }
+
+    public Set<StaticVariableReference> getStaticVariableReferences() {
+        return stmtGraph.getStmts().stream()
+                .filter(Stmt::containsFieldRef)
+                .map(Stmt::getFieldRef)
+                .filter(fr -> fr instanceof JStaticFieldRef)
+                .filter(sfr -> {
+                    Optional<JavaSootField> field = view.getField(sfr.getFieldSignature());
+                    if (!field.isPresent()) return false;
+                    JavaSootField javaSootField = field.get();
+                    return !javaSootField.isFinal();
+                })
+                .map(JFieldRef::getFieldSignature)
+                .map(fieldSignature -> new StaticVariableReference(fieldSignature.getDeclClassType().getClassName(), fieldSignature.getName()))
+                .collect(Collectors.toSet());
     }
 
     private CallGraph getCallGraph() {
