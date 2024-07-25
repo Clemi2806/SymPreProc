@@ -1,10 +1,10 @@
-package at.aau.serg.soot;
+package at.aau.serg.soot.analysisTypes;
 
 import sootup.core.types.Type;
 
 import java.util.Objects;
 
-public class StaticVariableReference {
+public class StaticVariableReference extends AnalysisResult {
     private String className;
     private String variableName;
     private Type type;

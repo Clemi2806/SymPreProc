@@ -1,6 +1,6 @@
 package at.aau.serg.javaparser;
 
-import at.aau.serg.soot.StaticVariableReference;
+import at.aau.serg.soot.analysisTypes.StaticVariableReference;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -9,10 +9,7 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
-import org.checkerframework.checker.units.qual.A;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;

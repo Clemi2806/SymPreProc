@@ -1,11 +1,11 @@
-package at.aau.serg.soot;
+package at.aau.serg.soot.analysisTypes;
 
 import com.github.javaparser.ast.type.Type;
 import sootup.core.types.PrimitiveType;
 
 import java.util.Objects;
 
-public class StaticMethodCall {
+public class StaticMethodCall extends AnalysisResult{
     private String methodName;
     private PrimitiveType returnType;
     private String className;

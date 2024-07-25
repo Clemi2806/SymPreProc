@@ -1,10 +1,9 @@
 package at.aau.serg.javaparser;
 
-import at.aau.serg.soot.StaticMethodCall;
+import at.aau.serg.soot.analysisTypes.StaticMethodCall;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.*;
 
 import java.util.Optional;

@@ -1,6 +1,9 @@
 package at.aau.serg.soot;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import at.aau.serg.soot.analysisTypes.StaticMethodCall;
+import at.aau.serg.soot.analysisTypes.StaticVariableReference;
 import org.junit.jupiter.api.Test;
 import sootup.core.types.PrimitiveType;
 

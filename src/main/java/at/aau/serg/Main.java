@@ -5,12 +5,14 @@ import at.aau.serg.javaparser.JParser;
 import at.aau.serg.javaparser.MethodNotFoundException;
 import at.aau.serg.javaparser.StaticCallParser;
 import at.aau.serg.javaparser.StaticVariableParser;
+import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.SootAnalysis;
-import at.aau.serg.soot.StaticMethodCall;
+import at.aau.serg.soot.analysisTypes.AnalysisResult;
+import at.aau.serg.soot.decorators.StaticMethodCallAnalysis;
+import at.aau.serg.soot.decorators.StaticVariableReferenceAnalysis;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 public class Main {
@@ -50,11 +52,12 @@ public class Main {
         String className = methodSpecifier.substring(0, methodSpecifier.lastIndexOf("."));
 
         System.out.println("----- Starting analysis -----");
-        SootAnalysis analysis = new SootAnalysis(classPath, className, methodName);
+        Analysis analysis = new StaticVariableReferenceAnalysis(new StaticMethodCallAnalysis(new SootAnalysis(classPath, className, methodName)));
 
-        StaticCallParser staticCallParser = new StaticCallParser(analysis.getStaticMethodCalls());
+        Set<AnalysisResult> resultSet = analysis.analyse();
 
-        StaticVariableParser staticVariableParser = new StaticVariableParser(analysis.getStaticVariableReferences());
+        System.out.println("----- Analysis completed -----");
+        System.out.println(resultSet);
 
         JParser jParser;
         try {
@@ -65,11 +68,11 @@ public class Main {
 
         System.out.println("----- Parsing static method calls -----");
 
-        jParser.parseMethod(staticCallParser);
+        //jParser.parseMethod(staticCallParser);
 
         System.out.println("----- Parsing static variables -----");
 
-        jParser.parseMethod(staticVariableParser);
+        //jParser.parseMethod(staticVariableParser);
 
         try {
             jParser.export(outputFile);
