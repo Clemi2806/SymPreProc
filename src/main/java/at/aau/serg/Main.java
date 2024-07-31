@@ -6,6 +6,7 @@ import at.aau.serg.javaparser.MethodNotFoundException;
 import at.aau.serg.javaparser.StaticCallParser;
 import at.aau.serg.javaparser.StaticVariableParser;
 import at.aau.serg.soot.Analysis;
+import at.aau.serg.soot.AnalysisBuilder;
 import at.aau.serg.soot.SootAnalysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.decorators.StaticMethodCallAnalysis;
@@ -52,7 +53,8 @@ public class Main {
         String className = methodSpecifier.substring(0, methodSpecifier.lastIndexOf("."));
 
         System.out.println("----- Starting analysis -----");
-        Analysis analysis = new StaticVariableReferenceAnalysis(new StaticMethodCallAnalysis(new SootAnalysis(classPath, className, methodName)));
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(classPath, className, methodName));
+        Analysis analysis = analysisBuilder.fullAnalysis();
 
         Set<AnalysisResult> resultSet = analysis.analyse();
 

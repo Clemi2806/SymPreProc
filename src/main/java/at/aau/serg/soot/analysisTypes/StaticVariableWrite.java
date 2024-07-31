@@ -4,12 +4,12 @@ import sootup.core.types.Type;
 
 import java.util.Objects;
 
-public class StaticVariableReference extends AnalysisResult {
+public class StaticVariableWrite extends AnalysisResult {
     private String className;
     private String variableName;
     private Type type;
 
-    public StaticVariableReference(String className, String variableName, Type type) {
+    public StaticVariableWrite(String className, String variableName, Type type) {
         this.className = className;
         this.variableName = variableName;
         this.type = type;
@@ -29,7 +29,7 @@ public class StaticVariableReference extends AnalysisResult {
 
     @Override
     public String toString() {
-        return "StaticVariableReference{" +
+        return "StaticVariableWrite{" +
                 "className='" + className + '\'' +
                 ", variableName='" + variableName + '\'' +
                 '}';
@@ -39,7 +39,7 @@ public class StaticVariableReference extends AnalysisResult {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StaticVariableReference that = (StaticVariableReference) o;
+        StaticVariableWrite that = (StaticVariableWrite) o;
         return Objects.equals(className, that.className) && Objects.equals(variableName, that.variableName);
     }
 
