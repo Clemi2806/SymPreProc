@@ -15,8 +15,6 @@ public class A {
             assert a > 10;
         }
 
-        "".equals("dsa");
-
         return x+1;
     }
 }

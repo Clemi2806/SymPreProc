@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.StaticMethodCall;
 import at.aau.serg.soot.analysisTypes.StaticVariableReference;
+import at.aau.serg.soot.analysisTypes.StaticVariableWrite;
 import at.aau.serg.soot.decorators.StaticMethodCallAnalysis;
 import at.aau.serg.soot.decorators.StaticVariableReferenceAnalysis;
 import org.junit.jupiter.api.Test;
@@ -39,5 +40,26 @@ public class SootAnalysisTest {
         StaticVariableReference expected = new StaticVariableReference("B", "y", PrimitiveType.getInt());
 
         assertEquals(expected, references.iterator().next());
+    }
+
+    @Test
+    public void testStaticVariableWrite() {
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.staticVars.A", "snippet"));
+        Analysis analysis = analysisBuilder.staticVariableWrite().build();
+
+        Set<AnalysisResult> results = analysis.analyse();
+
+        assertEquals(1, results.size());
+        assertEquals(new StaticVariableWrite("B", "x", PrimitiveType.getInt()), results.iterator().next());
+    }
+
+    @Test
+    public void testNoStaticVariableWrite() {
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.staticVars.NoStaticWrite", "snippet"));
+        Analysis analysis = analysisBuilder.staticVariableWrite().build();
+
+        Set<AnalysisResult> results = analysis.analyse();
+
+        assertTrue(results.isEmpty());
     }
 }

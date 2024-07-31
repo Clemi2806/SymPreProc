@@ -4,16 +4,16 @@ import java.util.*;
 
 public class A {
     public static void main(String[] args) {
-        int a = (int) (Math.random() * 100);
-        int bx = (int) (Math.random() * 100);
-        snippet(a, bx);
+        snippet(0);
     }
 
-    public static Object[] snippet(int a, int bx) {
-        if(bx < 0) {
-            return new Object[]{a, bx};
+    public static int snippet(int a) {
+        if(B.x != 0) {
+            B.x = 0;
+            return a;
         } else {
-            return new Object[]{-a, bx};
+            B.x = 1;
+            return -a;
         }
     }
 }
