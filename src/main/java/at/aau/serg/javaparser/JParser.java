@@ -41,7 +41,6 @@ public class JParser {
 
         compilationUnit = StaticJavaParser.parse(Files.newInputStream(file.toPath()));
 
-        // TODO: Specify method using full signature, to filter out overloaded methods
         method = compilationUnit
                 .findAll(MethodDeclaration.class)
                 .stream().filter(md -> md.getNameAsString().equals(methodName))

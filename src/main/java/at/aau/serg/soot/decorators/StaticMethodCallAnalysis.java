@@ -10,6 +10,9 @@ import sootup.java.core.JavaSootMethod;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class StaticMethodCallAnalysis extends AnalysisDecorator{
     public StaticMethodCallAnalysis(Analysis analysis) {
@@ -24,25 +27,17 @@ public class StaticMethodCallAnalysis extends AnalysisDecorator{
     }
 
     private Set<StaticMethodCall> getStaticMethodCalls() {
-        Set<StaticMethodCall> staticMethodCalls = new HashSet<>();
+        Predicate<JavaSootMethod> isStatic = method -> method.isStatic() && !method.getName().startsWith("<") && !method.isBuiltInMethod();
+        Predicate<JavaSootMethod> isOfIntType = method -> PrimitiveType.isIntLikeType(method.getReturnType());
 
-        for (MethodSignature methodSignature : getCallGraph().callsFrom(getMethod().getSignature())) {
-            Optional<JavaSootMethod> methodOptional = getView().getMethod(methodSignature);
+        Function<MethodSignature, JavaSootMethod> getSootMethodUsingSignature = signature -> getView().getMethod(signature).orElseThrow(() ->  new RuntimeException("Method " + signature.getName() + " not found"));
+        Function<JavaSootMethod, StaticMethodCall> convertToStaticMethodCall = method -> new StaticMethodCall(method.getDeclaringClassType().getClassName(), method.getName(), (PrimitiveType) method.getReturnType());
 
-            if(!methodOptional.isPresent())
-                throw new RuntimeException("Method " + methodSignature.getName() + " not found");
-
-            JavaSootMethod method = methodOptional.get();
-
-            if(!method.isStatic() || method.getName().startsWith("<") || method.isBuiltInMethod())
-                continue;
-
-            if(!PrimitiveType.isIntLikeType(method.getReturnType()))
-                throw new RuntimeException("Method " + method.getName() + " is not int-like type");
-
-            staticMethodCalls.add(new StaticMethodCall(method.getDeclaringClassType().getClassName(), method.getName(), (PrimitiveType) method.getReturnType()));
-        }
-
-        return staticMethodCalls;
+        return getCallGraph().callsFrom(getMethod().getSignature()).stream()
+                .map(getSootMethodUsingSignature)
+                .filter(isStatic)
+                .filter(isOfIntType)
+                .map(convertToStaticMethodCall)
+                .collect(Collectors.toSet());
     }
 }
