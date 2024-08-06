@@ -74,4 +74,9 @@ public class StaticMethodCall extends AnalysisResult{
         }
         return null;
     }
+
+    @Override
+    public String getNewVariableName() {
+        return "M"+className+methodName;
+    }
 }

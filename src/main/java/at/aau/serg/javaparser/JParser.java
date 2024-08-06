@@ -5,18 +5,24 @@ import at.aau.serg.soot.analysisTypes.StaticMethodCall;
 import at.aau.serg.soot.analysisTypes.StaticVariableReference;
 import at.aau.serg.soot.analysisTypes.StaticVariableWrite;
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.ArrayCreationLevel;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.*;
-import javassist.expr.MethodCall;
+import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.type.ArrayType;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.Optional;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class JParser {
@@ -45,6 +51,7 @@ public class JParser {
     }
 
     public void parse(Set<AnalysisResult> results) {
+        if(!method.getBody().isPresent()) throw new IllegalStateException("Unable to load method body");
         for (AnalysisResult result : results) {
             if(result instanceof StaticMethodCall) {
                 parseStaticMethodCall((StaticMethodCall) result);
@@ -57,23 +64,40 @@ public class JParser {
     }
 
     private void parseStaticVariableWrite(StaticVariableWrite staticVariableWrite) {
-        throw new UnsupportedOperationException("Not implemented yet");
+
+        // Add new parameter if parameter does not exist yet
+        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(staticVariableWrite.getNewVariableName()) && p.getType().equals(staticVariableWrite.getReturnTypeAsJavaParserType()))) {
+            Parameter newParam = new Parameter(staticVariableWrite.getReturnTypeAsJavaParserType(), staticVariableWrite.getNewVariableName());
+            method.addParameter(newParam);
+        }
+
+        Predicate<FieldAccessExpr> isAccessOnVariable = fieldAccessExpr -> fieldAccessExpr.getScope().toString().equals(staticVariableWrite.getClassName()) && fieldAccessExpr.getNameAsString().equals(staticVariableWrite.getVariableName());
+        Consumer<FieldAccessExpr> replaceAccessExpr = fieldAccessExpr -> fieldAccessExpr.replace(new NameExpr(staticVariableWrite.getNewVariableName()));
+
+
+        method.getBody().get().findAll(AssignExpr.class).stream()
+                .map(AssignExpr::getTarget)
+                .filter(Expression::isFieldAccessExpr)
+                .map(Expression::asFieldAccessExpr)
+                .filter(isAccessOnVariable)
+                .forEach(replaceAccessExpr);
+
+        changeReturnTypeToList();
+        changeReturnStatements(staticVariableWrite.getNewVariableName());
     }
 
     private void parseStaticVariableReference(StaticVariableReference staticVariableReference) {
-        if(!method.getBody().isPresent()) return;
+        // Add new parameter if parameter does not exist yet
+        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(staticVariableReference.getNewVariableName()) && p.getType().equals(staticVariableReference.getReturnTypeAsJavaParserType()))) {
+            Parameter newParam = new Parameter(staticVariableReference.getReturnTypeAsJavaParserType(), staticVariableReference.getNewVariableName());
+            method.addParameter(newParam);
+        }
 
-        AtomicInteger c = new AtomicInteger();
         method.getBody().get().findAll(FieldAccessExpr.class).forEach(fae -> {
-            if(match(fae, staticVariableReference)){
+            if(isMatch(fae, staticVariableReference)){
                 // Replace
                 System.out.println("Replacing static variable " + fae);
-
-                String newVariableName = staticVariableReference.getClassName()+staticVariableReference.getVariableName()+c;
-                Parameter newParam = new Parameter(staticVariableReference.getReturnTypeAsJavaParserType(), newVariableName);
-                method.addParameter(newParam);
-                fae.replace(new NameExpr(newVariableName));
-                c.getAndIncrement();
+                fae.replace(new NameExpr(staticVariableReference.getNewVariableName()));
             }
         });
 
@@ -81,16 +105,14 @@ public class JParser {
     }
 
     private void parseStaticMethodCall(StaticMethodCall staticMethodCall) {
-        if(!method.getBody().isPresent()) return;
-        String newParameterName = staticMethodCall.getClassName()+staticMethodCall.getMethodName();
-        method.addParameter(staticMethodCall.getReturnTypeAsJavaParserType(),newParameterName);
+        method.addParameter(staticMethodCall.getReturnTypeAsJavaParserType(), staticMethodCall.getNewVariableName());
         // remove all calls to method with new parameter
         method.getBody().get().findAll(MethodCallExpr.class).forEach(callExpr -> {
             if (callExpr.getScope().isPresent() && callExpr.getScope().get().toString().equals(staticMethodCall.getClassName())) {
                 if (callExpr.getNameAsString().equals(staticMethodCall.getMethodName())) {
                     // Jackpot
                     System.out.printf("Replacing static method call %s%n", staticMethodCall.getCallString());
-                    callExpr.replace(new NameExpr(newParameterName));
+                    callExpr.replace(new NameExpr(staticMethodCall.getNewVariableName()));
                 }
             }
         });
@@ -122,8 +144,42 @@ public class JParser {
         writer.close();
     }
 
-    private boolean match(FieldAccessExpr fae, StaticVariableReference ref) {
+    private boolean isMatch(FieldAccessExpr fae, StaticVariableReference ref) {
         return ref.getClassName().equals(fae.getScope().toString()) && ref.getVariableName().equals(fae.getNameAsString());
+    }
+
+    private void changeReturnTypeToList() {
+        if(method.getType().toString().equals("Object[]")) return;
+        method.setType(new ArrayType(new ClassOrInterfaceType(null,"Object")));
+    }
+
+    private void changeReturnStatements(String newVariableName) {
+        method.getBody().get().findAll(ReturnStmt.class).forEach(returnStmt -> {
+            if(returnStmt.getExpression().isPresent()) {
+                Expression exp = returnStmt.getExpression().get();
+                if(isObjectArrayCreationExpr(exp)) {
+                    ((ArrayCreationExpr) exp).getInitializer().get().getValues().add(new NameExpr(newVariableName));
+                } else {
+                    returnStmt.setExpression(createObjectArrayCreationExpr(exp, new NameExpr(newVariableName)));
+                }
+            } else {
+                returnStmt.setExpression(createObjectArrayCreationExpr(new NameExpr(newVariableName)));
+            }
+        });
+    }
+
+    private boolean isObjectArrayCreationExpr(Expression exp) {
+        return exp instanceof ArrayCreationExpr
+                && ((ArrayCreationExpr) exp).getElementType().toString().equals("Object")
+                && ((ArrayCreationExpr) exp).getInitializer().isPresent();
+    }
+
+    private ArrayCreationExpr createObjectArrayCreationExpr(Expression... expressions) {
+        return new ArrayCreationExpr(
+                new ClassOrInterfaceType(null, "Object"),
+                NodeList.nodeList(new ArrayCreationLevel()),
+                new ArrayInitializerExpr(NodeList.nodeList(expressions))
+        );
     }
 
     protected static Expression convertParameter(Parameter parameter) {

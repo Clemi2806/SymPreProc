@@ -69,4 +69,9 @@ public class StaticVariableReference extends AnalysisResult {
         }
         return null;
     }
+
+    @Override
+    public String getNewVariableName() {
+        return "V"+className+variableName;
+    }
 }

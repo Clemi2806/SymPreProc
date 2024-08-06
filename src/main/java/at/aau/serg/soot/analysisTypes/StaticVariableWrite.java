@@ -69,4 +69,9 @@ public class StaticVariableWrite extends AnalysisResult {
         }
         return null;
     }
+
+    @Override
+    public String getNewVariableName() {
+        return "V" + className + variableName;
+    }
 }
