@@ -35,13 +35,14 @@ public class StaticVariableReferenceAnalysis extends AnalysisDecorator{
             JavaSootField javaSootField = field.get();
             return !javaSootField.isFinal();
         };
+        Predicate<JFieldRef> isStaticFieldRef = fr -> fr instanceof JStaticFieldRef;
 
         Function<FieldSignature, StaticVariableReference> convertToStaticVariableRef = fieldSignature -> new StaticVariableReference(fieldSignature.getDeclClassType().getClassName(), fieldSignature.getName(), fieldSignature.getType());
 
         return getStmtGraph().getStmts().stream()
                 .filter(Stmt::containsFieldRef)
                 .map(Stmt::getFieldRef)
-                .filter(fr -> fr instanceof JStaticFieldRef)
+                .filter(isStaticFieldRef)
                 .filter(isNotFinal)
                 .map(JFieldRef::getFieldSignature)
                 .map(convertToStaticVariableRef)
