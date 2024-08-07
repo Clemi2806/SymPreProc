@@ -29,7 +29,7 @@ public class StaticMethodCallAnalysis extends AnalysisDecorator{
     private Set<StaticMethodCall> getStaticMethodCalls() {
         Predicate<JavaSootMethod> isStatic = method -> method.isStatic() && !method.getName().startsWith("<");
         Predicate<JavaSootMethod> isUsableType = method -> PrimitiveType.isIntLikeType(method.getReturnType()) || method.getReturnType() instanceof PrimitiveType.DoubleType || method.getReturnType() instanceof PrimitiveType.FloatType;
-        Predicate<JavaSootMethod> isNotMethodOfExcludedScope = method ->  EXCLUDED_SCOPES.stream().noneMatch(s -> method.getDeclaringClassType().getPackageName().toString().startsWith(s));
+        Predicate<JavaSootMethod> isNotMethodOfExcludedScope = method ->  EXCLUDED_SCOPES.stream().noneMatch(s -> method.getDeclaringClassType().getFullyQualifiedName().toString().startsWith(s));
         Predicate<JavaSootMethod> isNotMethodOfSameClass = method -> !method.getDeclaringClassType().equals(getMethod().getDeclaringClassType());
 
         Function<MethodSignature, JavaSootMethod> getSootMethodUsingSignature = signature -> getView().getMethod(signature).orElseThrow(() ->  new RuntimeException("Method " + signature.getName() + " not found"));
