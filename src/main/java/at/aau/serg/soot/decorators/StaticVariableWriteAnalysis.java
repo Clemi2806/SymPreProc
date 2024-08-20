@@ -2,15 +2,13 @@ package at.aau.serg.soot.decorators;
 
 import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
-import at.aau.serg.soot.analysisTypes.StaticVariableWrite;
+import at.aau.serg.soot.analysisTypes.ReferenceType;
+import at.aau.serg.soot.analysisTypes.StaticVariableReference;
 import sootup.core.jimple.common.ref.JStaticFieldRef;
 import sootup.core.jimple.common.stmt.JAssignStmt;
-import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.FieldSignature;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,8 +26,8 @@ public class StaticVariableWriteAnalysis extends AnalysisDecorator {
         return results;
     }
 
-    private Set<StaticVariableWrite> getStaticVariableWrites() {
-        Function<FieldSignature, StaticVariableWrite> convertToStaticVariableWrite = fs -> new StaticVariableWrite(fs.getDeclClassType().getClassName(),fs.getName(), fs.getType());
+    private Set<StaticVariableReference> getStaticVariableWrites() {
+        Function<FieldSignature, StaticVariableReference> convertToStaticVariableWrite = fs -> new StaticVariableReference(fs.getDeclClassType().getClassName(),fs.getName(), fs.getType(), ReferenceType.WRITE);
 
         return getStmtGraph().getStmts().stream()
                 .filter(stmt -> stmt instanceof JAssignStmt)

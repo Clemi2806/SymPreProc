@@ -3,9 +3,9 @@ package at.aau.serg.soot;
 import static org.junit.jupiter.api.Assertions.*;
 
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
+import at.aau.serg.soot.analysisTypes.ReferenceType;
 import at.aau.serg.soot.analysisTypes.StaticMethodCall;
 import at.aau.serg.soot.analysisTypes.StaticVariableReference;
-import at.aau.serg.soot.analysisTypes.StaticVariableWrite;
 import at.aau.serg.soot.decorators.StaticMethodCallAnalysis;
 import at.aau.serg.soot.decorators.StaticVariableReferenceAnalysis;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class SootAnalysisTest {
 
         assertEquals(1, references.size());
         assertTrue((references.iterator().next() instanceof StaticVariableReference));
-        StaticVariableReference expected = new StaticVariableReference("B", "y", PrimitiveType.getInt());
+        StaticVariableReference expected = new StaticVariableReference("B", "y", PrimitiveType.getInt(), ReferenceType.READ);
 
         assertEquals(expected, references.iterator().next());
     }
@@ -50,7 +50,7 @@ public class SootAnalysisTest {
         Set<AnalysisResult> results = analysis.analyse();
 
         assertEquals(1, results.size());
-        assertEquals(new StaticVariableWrite("B", "x", PrimitiveType.getInt()), results.iterator().next());
+        assertEquals(new StaticVariableReference("B", "x", PrimitiveType.getInt(), ReferenceType.WRITE), results.iterator().next());
     }
 
     @Test

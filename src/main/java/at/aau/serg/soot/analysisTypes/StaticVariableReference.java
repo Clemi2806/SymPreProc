@@ -8,11 +8,17 @@ public class StaticVariableReference extends AnalysisResult {
     private String className;
     private String variableName;
     private Type type;
+    private ReferenceType referenceType;
 
-    public StaticVariableReference(String className, String variableName, Type type) {
+    public StaticVariableReference(String className, String variableName, Type type, ReferenceType referenceType) {
         this.className = className;
         this.variableName = variableName;
         this.type = type;
+        this.referenceType = referenceType;
+    }
+
+    public ReferenceType getReferenceType() {
+        return referenceType;
     }
 
     public String getClassName() {

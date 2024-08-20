@@ -3,7 +3,6 @@ package at.aau.serg.javaparser;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.StaticMethodCall;
 import at.aau.serg.soot.analysisTypes.StaticVariableReference;
-import at.aau.serg.soot.analysisTypes.StaticVariableWrite;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.ArrayCreationLevel;
 import com.github.javaparser.ast.CompilationUnit;
@@ -17,11 +16,8 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -55,14 +51,23 @@ public class JParser {
             if(result instanceof StaticMethodCall) {
                 parseStaticMethodCall((StaticMethodCall) result);
             } else if (result instanceof StaticVariableReference) {
-                parseStaticVariableReference((StaticVariableReference) result);
-            } else if (result instanceof StaticVariableWrite) {
-                parseStaticVariableWrite((StaticVariableWrite) result);
+                StaticVariableReference ref = (StaticVariableReference) result;
+                switch (ref.getReferenceType()) {
+                    case READ:
+                        parseStaticVariableReference(ref);
+                        break;
+                    case WRITE:
+                        parseStaticVariableWrite(ref);
+                        break;
+                    default:
+                        new UnsupportedOperationException("Unsupported reference type: " + ref.getReferenceType());
+                        break;
+                }
             }
         }
     }
 
-    private void parseStaticVariableWrite(StaticVariableWrite staticVariableWrite) {
+    private void parseStaticVariableWrite(StaticVariableReference staticVariableWrite) {
 
         // Add new parameter if parameter does not exist yet
         if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(staticVariableWrite.getNewVariableName()) && p.getType().equals(staticVariableWrite.getReturnTypeAsJavaParserType()))) {
