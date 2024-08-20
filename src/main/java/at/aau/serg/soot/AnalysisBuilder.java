@@ -1,5 +1,6 @@
 package at.aau.serg.soot;
 
+import at.aau.serg.soot.decorators.ObjectFieldWrite;
 import at.aau.serg.soot.decorators.StaticMethodCallAnalysis;
 import at.aau.serg.soot.decorators.StaticVariableReferenceAnalysis;
 import at.aau.serg.soot.decorators.StaticVariableWriteAnalysis;
@@ -32,7 +33,12 @@ public class AnalysisBuilder {
         return this;
     }
 
+    public AnalysisBuilder objectFieldWrite() {
+        this.analysis = new ObjectFieldWrite(analysis);
+        return this;
+    }
+
     public Analysis fullAnalysis() {
-        return this.staticMethodCall().staticVariableRef().staticVariableWrite().build();
+        return this.staticMethodCall().staticVariableRef().staticVariableWrite().objectFieldWrite().build();
     }
 }

@@ -2,10 +2,8 @@ package at.aau.serg.soot;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import at.aau.serg.soot.analysisTypes.AnalysisResult;
-import at.aau.serg.soot.analysisTypes.ReferenceType;
-import at.aau.serg.soot.analysisTypes.StaticMethodCall;
-import at.aau.serg.soot.analysisTypes.StaticVariableReference;
+import at.aau.serg.soot.analysisTypes.*;
+import at.aau.serg.soot.decorators.ObjectFieldWrite;
 import at.aau.serg.soot.decorators.StaticMethodCallAnalysis;
 import at.aau.serg.soot.decorators.StaticVariableReferenceAnalysis;
 import org.junit.jupiter.api.Test;
@@ -61,5 +59,20 @@ public class SootAnalysisTest {
         Set<AnalysisResult> results = analysis.analyse();
 
         assertTrue(results.isEmpty());
+    }
+
+    @Test
+    public void testObjectFieldWrite() {
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.objects.A", "snippet"));
+        Analysis analysis = analysisBuilder.objectFieldWrite().build();
+
+        Set<AnalysisResult> results = analysis.analyse();
+
+        assertEquals(2, results.size());
+        assertEquals(1, results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("b")).count());
+        assertEquals(1, results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("b2")).count());
+
+        assertEquals("V_B_b_y", results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("b")).findFirst().get().getNewVariableName());
+        assertEquals("V_B_b2_y", results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("b2")).findFirst().get().getNewVariableName());
     }
 }
