@@ -3,6 +3,7 @@ package at.aau.serg.soot;
 import static org.junit.jupiter.api.Assertions.*;
 
 import at.aau.serg.soot.analysisTypes.*;
+import at.aau.serg.soot.decorators.ObjectFieldRead;
 import at.aau.serg.soot.decorators.ObjectFieldWrite;
 import at.aau.serg.soot.decorators.StaticMethodCallAnalysis;
 import at.aau.serg.soot.decorators.StaticVariableReferenceAnalysis;
@@ -74,5 +75,18 @@ public class SootAnalysisTest {
 
         assertEquals("V_B_b_y", results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("b")).findFirst().get().getNewVariableName());
         assertEquals("V_B_b2_y", results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("b2")).findFirst().get().getNewVariableName());
+    }
+
+    @Test
+    public void testObjectFieldRead() {
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.objects.A", "snippet"));
+        Analysis analysis = analysisBuilder.objectFieldRead().build();
+
+        Set<AnalysisResult> results = analysis.analyse();
+
+        assertEquals(1, results.size());
+        ObjectFieldReference ofr = (ObjectFieldReference) results.iterator().next();
+        assertEquals("V_B_b2_y", ofr.getNewVariableName());
+        assertEquals(ReferenceType.READ,ofr.getReferenceType());
     }
 }

@@ -10,7 +10,7 @@ public class A {
         B b2 = new B();
         b.y = 10;
         b2.y = 20;
-        B.z = 10;
+        B.z = b2.y;
         if(b.getX() > 100) {
             b.setX(10);
         } else {
