@@ -1,6 +1,7 @@
 package at.aau.serg.javaparser;
 
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
+import at.aau.serg.soot.analysisTypes.ObjectFieldReference;
 import at.aau.serg.soot.analysisTypes.StaticMethodCall;
 import at.aau.serg.soot.analysisTypes.StaticVariableReference;
 import com.github.javaparser.StaticJavaParser;
@@ -46,6 +47,7 @@ public class JParser {
     }
 
     public void parse(Set<AnalysisResult> results) {
+        System.out.println("----- Starting parsing -----");
         if(!method.getBody().isPresent()) throw new IllegalStateException("Unable to load method body");
         for (AnalysisResult result : results) {
             if(result instanceof StaticMethodCall) {
@@ -63,8 +65,60 @@ public class JParser {
                         new UnsupportedOperationException("Unsupported reference type: " + ref.getReferenceType());
                         break;
                 }
+            } else if (result instanceof ObjectFieldReference) {
+                ObjectFieldReference ref = (ObjectFieldReference) result;
+                switch (ref.getReferenceType()) {
+                    case READ:
+                        parseObjectFieldRead(ref);
+                        break;
+                    case WRITE:
+                        parseObjectFieldWrite(ref);
+                        break;
+                    default:
+                        new UnsupportedOperationException("Unsupported reference type: " + ref.getReferenceType());
+                        break;
+                }
             }
         }
+        System.out.println("----- Finished parsing -----");
+    }
+
+    private void parseObjectFieldRead(ObjectFieldReference ref) {
+        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(ref.getNewVariableName()) && p.getType().equals(ref.getReturnTypeAsJavaParserType()))) {
+            Parameter newParam = new Parameter(ref.getReturnTypeAsJavaParserType(), ref.getNewVariableName());
+            method.addParameter(newParam);
+        }
+
+        Predicate<FieldAccessExpr> isFieldRead = fae -> {
+            if(!fae.hasParentNode()) return true;
+            if(!(fae.getParentNode().get() instanceof AssignExpr)) return true;
+            return !((AssignExpr) fae.getParentNode().get()).getTarget().equals(fae);
+        };
+        Predicate<FieldAccessExpr> isObjectUnderInspection = fae -> fae.getScope().toString().equals(ref.getObjectName()) && fae.getNameAsString().equals(ref.getFieldName());
+        Consumer<FieldAccessExpr> replace = fae -> fae.replace(new NameExpr(ref.getNewVariableName()));
+
+        method.findAll(FieldAccessExpr.class).stream()
+                .filter(isFieldRead)
+                .filter(isObjectUnderInspection)
+                .forEach(replace);
+    }
+
+    private void parseObjectFieldWrite(ObjectFieldReference ref) {
+        //throw new UnsupportedOperationException("Not implemented yet");
+        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(ref.getNewVariableName()) && p.getType().equals(ref.getReturnTypeAsJavaParserType()))) {
+            Parameter newParam = new Parameter(ref.getReturnTypeAsJavaParserType(), ref.getNewVariableName());
+            method.addParameter(newParam);
+        }
+
+        Predicate<FieldAccessExpr> isObjectUnderInspection = fae -> fae.getScope().toString().equals(ref.getObjectName()) && fae.getNameAsString().equals(ref.getFieldName());
+        Consumer<FieldAccessExpr> replace = fae -> fae.replace(new NameExpr(ref.getNewVariableName()));
+
+        method.findAll(FieldAccessExpr.class).stream() // TODO: Add filter to only get writes
+                .filter(isObjectUnderInspection)
+                .forEach(replace);
+
+        changeReturnTypeToList();
+        changeReturnStatements(ref.getNewVariableName());
     }
 
     private void parseStaticVariableWrite(StaticVariableReference staticVariableWrite) {
@@ -90,6 +144,7 @@ public class JParser {
         changeReturnStatements(staticVariableWrite.getNewVariableName());
     }
 
+    // TODO: Fix method pipeline to only lookup static variable reads not writes
     private void parseStaticVariableReference(StaticVariableReference staticVariableReference) {
         // Add new parameter if parameter does not exist yet
         if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(staticVariableReference.getNewVariableName()) && p.getType().equals(staticVariableReference.getReturnTypeAsJavaParserType()))) {
@@ -158,6 +213,10 @@ public class JParser {
     }
 
     private void changeReturnStatements(String newVariableName) {
+        if(method.getBody().get().findAll(ReturnStmt.class).isEmpty()) {
+            method.getBody().get().getStatements().add(new ReturnStmt(createObjectArrayCreationExpr(new NameExpr(newVariableName))));
+            return;
+        }
         method.getBody().get().findAll(ReturnStmt.class).forEach(returnStmt -> {
             if(returnStmt.getExpression().isPresent()) {
                 Expression exp = returnStmt.getExpression().get();

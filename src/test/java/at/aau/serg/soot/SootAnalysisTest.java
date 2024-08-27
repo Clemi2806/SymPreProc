@@ -69,12 +69,10 @@ public class SootAnalysisTest {
 
         Set<AnalysisResult> results = analysis.analyse();
 
-        assertEquals(2, results.size());
-        assertEquals(1, results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("b")).count());
-        assertEquals(1, results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("b2")).count());
+        assertEquals(1, results.size());
+        assertEquals(1, results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("bStatic")).count());
 
-        assertEquals("V_B_b_y", results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("b")).findFirst().get().getNewVariableName());
-        assertEquals("V_B_b2_y", results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("b2")).findFirst().get().getNewVariableName());
+        assertEquals("V_B_bStatic_y", results.stream().map(ObjectFieldReference.class::cast).filter(obj -> obj.getObjectName().equals("bStatic")).findFirst().get().getNewVariableName());
     }
 
     @Test
@@ -86,7 +84,7 @@ public class SootAnalysisTest {
 
         assertEquals(1, results.size());
         ObjectFieldReference ofr = (ObjectFieldReference) results.iterator().next();
-        assertEquals("V_B_b2_y", ofr.getNewVariableName());
+        assertEquals("V_B_bStatic_y", ofr.getNewVariableName());
         assertEquals(ReferenceType.READ,ofr.getReferenceType());
     }
 }

@@ -38,6 +38,8 @@ public class StaticVariableReference extends AnalysisResult {
         return "StaticVariableReference{" +
                 "className='" + className + '\'' +
                 ", variableName='" + variableName + '\'' +
+                ", type=" + type +
+                ", referenceType=" + referenceType +
                 '}';
     }
 
@@ -46,12 +48,12 @@ public class StaticVariableReference extends AnalysisResult {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StaticVariableReference that = (StaticVariableReference) o;
-        return Objects.equals(className, that.className) && Objects.equals(variableName, that.variableName);
+        return Objects.equals(className, that.className) && Objects.equals(variableName, that.variableName) && Objects.equals(type, that.type) && referenceType == that.referenceType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(className, variableName);
+        return Objects.hash(className, variableName, type, referenceType);
     }
 
     public com.github.javaparser.ast.type.Type getReturnTypeAsJavaParserType() {

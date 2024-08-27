@@ -37,6 +37,7 @@ public class StaticVariableReferenceAnalysis extends AnalysisDecorator{
             return !javaSootField.isFinal();
         };
         Predicate<JFieldRef> isStaticFieldRef = fr -> fr instanceof JStaticFieldRef;
+        Predicate<JFieldRef> isParsable = fr -> isValidType(fr);
 
         Function<FieldSignature, StaticVariableReference> convertToStaticVariableRef = fieldSignature -> new StaticVariableReference(fieldSignature.getDeclClassType().getClassName(), fieldSignature.getName(), fieldSignature.getType(), ReferenceType.READ);
 
@@ -45,8 +46,24 @@ public class StaticVariableReferenceAnalysis extends AnalysisDecorator{
                 .map(Stmt::getFieldRef)
                 .filter(isStaticFieldRef)
                 .filter(isNotFinal)
+                .filter(isParsable)
                 .map(JFieldRef::getFieldSignature)
                 .map(convertToStaticVariableRef)
                 .collect(Collectors.toSet());
+    }
+
+    private boolean isValidType(JFieldRef fieldRef) {
+        switch (fieldRef.getType().toString()) {
+            case "boolean":
+            case "int":
+            case "short":
+            case "byte":
+            case "long":
+            case "float":
+            case "double":
+                return true;
+            default:
+                return false;
+        }
     }
 }
