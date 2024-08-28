@@ -41,6 +41,8 @@ public class MarkedMethodCallAnalysis extends AnalysisDecorator {
             return Arrays.stream(markedMethods).anyMatch(x -> x.equals(s));
         };
 
+        Predicate<AbstractInvokeExpr> isParsable = aie -> isValidType(aie.getType()) && aie.getArgs().stream().allMatch(i -> isValidType(i.getType()));
+
         Function<AbstractInvokeExpr, MarkedMethod> toMarkedMethod = invokeExpr -> {
             MethodSignature methodSignature = invokeExpr.getMethodSignature();
             return new MarkedMethod(methodSignature.getDeclClassType().getClassName(), methodSignature.getName(), invokeExpr.getType(), invokeExpr.getArgs().stream().map(Immediate::getType).collect(Collectors.toList()));
@@ -49,6 +51,7 @@ public class MarkedMethodCallAnalysis extends AnalysisDecorator {
         return getStmtGraph().getStmts().stream()
                 .filter(JInvokeStmt.class::isInstance).map(JInvokeStmt.class::cast).map(JInvokeStmt::getInvokeExpr)
                 .filter(isMarkedMethod)
+                .filter(isParsable)
                 .map(toMarkedMethod)
                 .collect(Collectors.toSet());
     }

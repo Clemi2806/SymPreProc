@@ -41,10 +41,13 @@ public class ObjectFieldReadAnalysis extends AnalysisDecorator{
                 .map(JSpecialInvokeExpr::getBase)
                 .anyMatch(l -> fr.getBase().equals(l));
 
+        Predicate<JInstanceFieldRef> isParsable = ifr -> isValidType(ifr.getType());
+
         return getStmtGraph().getStmts().stream()
                 .flatMap(Stmt::getUses)
                 .filter(JInstanceFieldRef.class::isInstance)
                 .map(JInstanceFieldRef.class::cast)
+                .filter(isParsable)
                 .filter(isLocalObject.negate())
                 .map(mapToObjectFieldRef)
                 .collect(Collectors.toSet());

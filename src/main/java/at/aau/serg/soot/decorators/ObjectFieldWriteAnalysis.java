@@ -42,12 +42,15 @@ public class ObjectFieldWriteAnalysis extends AnalysisDecorator {
                 .map(JSpecialInvokeExpr::getBase)
                 .anyMatch(l -> fr.getBase().equals(l));
 
+        Predicate<JInstanceFieldRef> isParsable = ifr -> isValidType(ifr.getType());
+
         return getStmtGraph().getStmts().stream()
                 .filter(Stmt::containsFieldRef)
                 .map(Stmt::getDef)
                 .filter(Optional::isPresent).map(Optional::get)
                 .filter(JInstanceFieldRef.class::isInstance)
                 .map(JInstanceFieldRef.class::cast)
+                .filter(isParsable)
                 .filter(isLocalObject.negate())
                 .map(mapToObjectFieldRef)
                 .collect(Collectors.toSet());
