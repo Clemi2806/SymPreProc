@@ -5,14 +5,12 @@ import at.aau.serg.soot.analysisTypes.ObjectFieldReference;
 import at.aau.serg.soot.analysisTypes.StaticMethodCall;
 import at.aau.serg.soot.analysisTypes.StaticVariableReference;
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.ArrayCreationLevel;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.ReturnStmt;
-import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 import java.io.*;
@@ -208,41 +206,36 @@ public class JParser {
     }
 
     private void changeReturnTypeToList() {
-        if(method.getType().toString().equals("Object[]")) return;
-        method.setType(new ArrayType(new ClassOrInterfaceType(null,"Object")));
+        if(method.getType().toString().equals("ReturnValues")) return;
+        method.setType(new ClassOrInterfaceType("ReturnValues"));
     }
 
     private void changeReturnStatements(String newVariableName) {
         if(method.getBody().get().findAll(ReturnStmt.class).isEmpty()) {
-            method.getBody().get().getStatements().add(new ReturnStmt(createObjectArrayCreationExpr(new NameExpr(newVariableName))));
+            method.getBody().get().getStatements().add(new ReturnStmt(createObjectCreationExpr(new NameExpr(newVariableName))));
             return;
         }
         method.getBody().get().findAll(ReturnStmt.class).forEach(returnStmt -> {
             if(returnStmt.getExpression().isPresent()) {
                 Expression exp = returnStmt.getExpression().get();
-                if(isObjectArrayCreationExpr(exp)) {
-                    ((ArrayCreationExpr) exp).getInitializer().get().getValues().add(new NameExpr(newVariableName));
+                if(isObjectCreationExpr(exp)) {
+                    ((ObjectCreationExpr) exp).getArguments().add(new NameExpr(newVariableName));
                 } else {
-                    returnStmt.setExpression(createObjectArrayCreationExpr(exp, new NameExpr(newVariableName)));
+                    returnStmt.setExpression(createObjectCreationExpr(exp, new NameExpr(newVariableName)));
                 }
             } else {
-                returnStmt.setExpression(createObjectArrayCreationExpr(new NameExpr(newVariableName)));
+                returnStmt.setExpression(createObjectCreationExpr(new NameExpr(newVariableName)));
             }
         });
     }
 
-    private boolean isObjectArrayCreationExpr(Expression exp) {
-        return exp instanceof ArrayCreationExpr
-                && ((ArrayCreationExpr) exp).getElementType().toString().equals("Object")
-                && ((ArrayCreationExpr) exp).getInitializer().isPresent();
+    private boolean isObjectCreationExpr(Expression exp) {
+        return exp instanceof ObjectCreationExpr
+                && ((ObjectCreationExpr) exp).getType().toString().equals("ReturnValues");
     }
 
-    private ArrayCreationExpr createObjectArrayCreationExpr(Expression... expressions) {
-        return new ArrayCreationExpr(
-                new ClassOrInterfaceType(null, "Object"),
-                NodeList.nodeList(new ArrayCreationLevel()),
-                new ArrayInitializerExpr(NodeList.nodeList(expressions))
-        );
+    private ObjectCreationExpr createObjectCreationExpr(Expression... expressions) {
+        return new ObjectCreationExpr(null, new ClassOrInterfaceType("ReturnValues"),new NodeList<>(expressions));
     }
 
     protected static Expression convertParameter(Parameter parameter) {
