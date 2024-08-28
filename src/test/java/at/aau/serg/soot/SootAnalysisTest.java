@@ -99,7 +99,7 @@ public class SootAnalysisTest {
         try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
 
             Configurations configurationsMock = mock(Configurations.class);
-            when(configurationsMock.getPropertyAsStringArray("methods")).thenReturn(new String[]{"java.io.PrintStream#println"});
+            when(configurationsMock.getPropertyAsStringArray("methods")).thenReturn(new String[]{"java.io.PrintStream.println"});
             configurationsClassMock.when(Configurations::getInstance).thenReturn(configurationsMock);
             configurationsClassMock.when(Configurations::exists).thenReturn(true);
 
@@ -122,7 +122,7 @@ public class SootAnalysisTest {
         try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
 
             Configurations configurationsMock = mock(Configurations.class);
-            when(configurationsMock.getPropertyAsStringArray("methods")).thenReturn(new String[]{"java.io.PrintStream#printf", "java.lang.Math#copySign"});
+            when(configurationsMock.getPropertyAsStringArray("methods")).thenReturn(new String[]{"java.io.PrintStream.printf", "java.lang.Math.copySign"});
             configurationsClassMock.when(Configurations::getInstance).thenReturn(configurationsMock);
             configurationsClassMock.when(Configurations::exists).thenReturn(true);
 
@@ -146,7 +146,7 @@ public class SootAnalysisTest {
         try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
 
             Configurations configurationsMock = mock(Configurations.class);
-            when(configurationsMock.getPropertyAsStringArray("methods")).thenReturn(new String[]{"java.io.PrintStream#printf", "testfiles.markedMethods.ObjectMethod#setX"});
+            when(configurationsMock.getPropertyAsStringArray("methods")).thenReturn(new String[]{"java.io.PrintStream.printf", "testfiles.markedMethods.ObjectMethod.setX"});
             configurationsClassMock.when(Configurations::getInstance).thenReturn(configurationsMock);
             configurationsClassMock.when(Configurations::exists).thenReturn(true);
 

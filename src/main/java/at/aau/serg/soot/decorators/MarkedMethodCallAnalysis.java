@@ -37,7 +37,7 @@ public class MarkedMethodCallAnalysis extends AnalysisDecorator {
 
         Predicate<AbstractInvokeExpr> isMarkedMethod = invokeExpr -> {
             MethodSignature methodSignature = invokeExpr.getMethodSignature();
-            String s = String.format("%s#%s", methodSignature.getDeclClassType().getFullyQualifiedName(), methodSignature.getSubSignature().getName());
+            String s = String.format("%s.%s", methodSignature.getDeclClassType().getFullyQualifiedName(), methodSignature.getSubSignature().getName());
             return Arrays.stream(markedMethods).anyMatch(x -> x.equals(s));
         };
 

@@ -23,7 +23,10 @@ public class Configurations {
     }
 
     public String[] getPropertyAsStringArray(String key) {
-        return properties.getProperty(key).split("\\w*,\\w*");
+        if (!properties.containsKey(key) || properties.getProperty(key).isEmpty()) {
+            return new String[0];
+        }
+        return properties.getProperty(key).split("\\s*,\\s*");
     }
 
     public static Configurations getInstance(Path configurationPath) throws IOException {
@@ -42,5 +45,9 @@ public class Configurations {
 
     public static boolean exists() {
         return INSTANCE != null;
+    }
+
+    public static void reset() {
+        INSTANCE = null;
     }
 }
