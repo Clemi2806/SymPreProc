@@ -12,7 +12,8 @@ public class CliUtils {
                 .addOption("s", "sourcepath", true, "sourcepath")
                 .addOption("c", "classpath", true, "classpath")
                 .addOption("m", "method", true, "fully specified methodname, like org.example.A.method1")
-                .addOption("o", "output", true, "output file");
+                .addOption("o", "output", true, "output file")
+                .addOption("k", "config", true, "config file");
     }
 
     public static void printHelp() {

@@ -1,14 +1,17 @@
 package at.aau.serg.soot;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+import at.aau.serg.cli.Configurations;
 import at.aau.serg.soot.analysisTypes.*;
-import at.aau.serg.soot.decorators.ObjectFieldRead;
-import at.aau.serg.soot.decorators.ObjectFieldWrite;
 import at.aau.serg.soot.decorators.StaticMethodCallAnalysis;
 import at.aau.serg.soot.decorators.StaticVariableReferenceAnalysis;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import sootup.core.types.PrimitiveType;
+
+import sootup.core.types.Type;
 
 import java.util.Set;
 
@@ -86,5 +89,75 @@ public class SootAnalysisTest {
         ObjectFieldReference ofr = (ObjectFieldReference) results.iterator().next();
         assertEquals("V_B_bStatic_y", ofr.getNewVariableName());
         assertEquals(ReferenceType.READ,ofr.getReferenceType());
+    }
+
+    @Test
+    public void markedMethodsTest() {
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.markedMethods.A", "snippet"));
+        Analysis analysis = analysisBuilder.markedMethodCall().build();
+
+        try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
+
+            Configurations configurationsMock = mock(Configurations.class);
+            when(configurationsMock.getPropertyAsStringArray("methods")).thenReturn(new String[]{"java.io.PrintStream#println"});
+            configurationsClassMock.when(Configurations::getInstance).thenReturn(configurationsMock);
+            configurationsClassMock.when(Configurations::exists).thenReturn(true);
+
+            Set<AnalysisResult> results = analysis.analyse();
+
+            assertEquals(1, results.size());
+            MarkedMethod mm = (MarkedMethod) results.iterator().next();
+            assertEquals(1, mm.getParameterTypes().size());
+            assertEquals("java.lang.String",mm.getParameterTypes().get(0).toString());
+            assertEquals("M_PrintStream_println", mm.getNewVariableName());
+        }
+
+    }
+
+    @Test
+    public void markedMethodsMultipleArgsTest() {
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.markedMethods.MultipleArgs", "snippet"));
+        Analysis analysis = analysisBuilder.markedMethodCall().build();
+
+        try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
+
+            Configurations configurationsMock = mock(Configurations.class);
+            when(configurationsMock.getPropertyAsStringArray("methods")).thenReturn(new String[]{"java.io.PrintStream#printf", "java.lang.Math#copySign"});
+            configurationsClassMock.when(Configurations::getInstance).thenReturn(configurationsMock);
+            configurationsClassMock.when(Configurations::exists).thenReturn(true);
+
+            Set<AnalysisResult> results = analysis.analyse();
+
+            assertEquals(1, results.size());
+            MarkedMethod mm = (MarkedMethod) results.iterator().next();
+            assertEquals(2, mm.getParameterTypes().size());
+            assertEquals("float",mm.getParameterTypes().get(0).toString());
+            assertEquals("float",mm.getParameterTypes().get(1).toString());
+            assertEquals("M_Math_copySign", mm.getNewVariableName());
+        }
+
+    }
+
+    @Test
+    public void markedMethodsObjectMethodTest() {
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.markedMethods.ObjectMethod", "snippet"));
+        Analysis analysis = analysisBuilder.markedMethodCall().build();
+
+        try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
+
+            Configurations configurationsMock = mock(Configurations.class);
+            when(configurationsMock.getPropertyAsStringArray("methods")).thenReturn(new String[]{"java.io.PrintStream#printf", "testfiles.markedMethods.ObjectMethod#setX"});
+            configurationsClassMock.when(Configurations::getInstance).thenReturn(configurationsMock);
+            configurationsClassMock.when(Configurations::exists).thenReturn(true);
+
+            Set<AnalysisResult> results = analysis.analyse();
+
+            assertEquals(1, results.size());
+            MarkedMethod mm = (MarkedMethod) results.iterator().next();
+            assertEquals(1, mm.getParameterTypes().size());
+            assertEquals("int",mm.getParameterTypes().get(0).toString());
+            assertEquals("M_ObjectMethod_setX", mm.getNewVariableName());
+        }
+
     }
 }

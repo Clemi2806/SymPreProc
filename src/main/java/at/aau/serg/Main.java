@@ -1,6 +1,7 @@
 package at.aau.serg;
 
 import at.aau.serg.cli.CliUtils;
+import at.aau.serg.cli.Configurations;
 import at.aau.serg.javaparser.JParser;
 import at.aau.serg.javaparser.MethodNotFoundException;
 import at.aau.serg.soot.Analysis;
@@ -10,7 +11,11 @@ import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
@@ -27,6 +32,7 @@ public class Main {
         String outputFile = cmd.getOptionValue("output");
         String classPath = cmd.getOptionValue("classpath");
         String methodSpecifier = cmd.getOptionValue("method");
+        String configurationFilePath = cmd.getOptionValue("config");
 
         if(sourcePath == null) {
             System.err.println("Source file required");
@@ -43,6 +49,20 @@ public class Main {
         if(methodSpecifier == null) {
             System.err.println("Method specifier required");
             System.exit(1);
+        }
+
+        if(configurationFilePath != null) {
+            Path configurationFile = Paths.get(configurationFilePath);
+            if(!Files.exists(configurationFile)) {
+                System.err.println("Configuration file does not exist");
+                System.exit(1);
+            }
+            Configurations configurations;
+            try {
+                configurations = Configurations.getInstance(configurationFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         String methodName = methodSpecifier.substring(methodSpecifier.lastIndexOf(".")+1);

@@ -31,16 +31,21 @@ public class AnalysisBuilder {
     }
 
     public AnalysisBuilder objectFieldWrite() {
-        this.analysis = new ObjectFieldWrite(analysis);
+        this.analysis = new ObjectFieldWriteAnalysis(analysis);
         return this;
     }
 
     public AnalysisBuilder objectFieldRead() {
-        this.analysis = new ObjectFieldRead(analysis);
+        this.analysis = new ObjectFieldReadAnalysis(analysis);
+        return this;
+    }
+
+    public AnalysisBuilder markedMethodCall() {
+        this.analysis = new MarkedMethodCallAnalysis(analysis);
         return this;
     }
 
     public Analysis fullAnalysis() {
-        return this.staticMethodCall().staticVariableRef().staticVariableWrite().objectFieldWrite().objectFieldRead().build();
+        return this.staticMethodCall().staticVariableRef().staticVariableWrite().objectFieldWrite().objectFieldRead().markedMethodCall().build();
     }
 }

@@ -4,7 +4,6 @@ import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.ObjectFieldReference;
 import at.aau.serg.soot.analysisTypes.ReferenceType;
-import sootup.core.jimple.basic.LValue;
 import sootup.core.jimple.common.expr.JSpecialInvokeExpr;
 import sootup.core.jimple.common.ref.JFieldRef;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
@@ -19,8 +18,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class ObjectFieldWrite extends AnalysisDecorator {
-    public ObjectFieldWrite(Analysis analysis) {
+public class ObjectFieldWriteAnalysis extends AnalysisDecorator {
+    public ObjectFieldWriteAnalysis(Analysis analysis) {
         super(analysis);
     }
 

@@ -4,8 +4,6 @@ import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.ObjectFieldReference;
 import at.aau.serg.soot.analysisTypes.ReferenceType;
-import sootup.core.jimple.basic.Value;
-import sootup.core.jimple.common.expr.JNewExpr;
 import sootup.core.jimple.common.expr.JSpecialInvokeExpr;
 import sootup.core.jimple.common.ref.JFieldRef;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
@@ -14,14 +12,13 @@ import sootup.core.jimple.common.stmt.JInvokeStmt;
 import sootup.core.jimple.common.stmt.Stmt;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class ObjectFieldRead extends AnalysisDecorator{
-    public ObjectFieldRead(Analysis analysis) {
+public class ObjectFieldReadAnalysis extends AnalysisDecorator{
+    public ObjectFieldReadAnalysis(Analysis analysis) {
         super(analysis);
     }
 
