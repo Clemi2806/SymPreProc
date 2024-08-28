@@ -1,4 +1,4 @@
-package at.aau.serg.soot;
+package at.aau.serg;
 
 import at.aau.serg.cli.Configurations;
 import org.junit.jupiter.api.BeforeEach;

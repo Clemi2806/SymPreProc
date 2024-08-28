@@ -1,4 +1,4 @@
-package at.aau.serg.soot;
+package at.aau.serg;
 
 import at.aau.serg.javaparser.JParser;
 import org.junit.jupiter.api.Test;
