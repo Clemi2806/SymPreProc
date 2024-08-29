@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static at.aau.serg.soot.SootAnalysisTest.CLASS_PATH;
+import static at.aau.serg.soot.SootAnalysisTests.CLASS_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ObjectFieldTest {

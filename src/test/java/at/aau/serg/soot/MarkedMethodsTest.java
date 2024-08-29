@@ -8,7 +8,7 @@ import org.mockito.MockedStatic;
 
 import java.util.Set;
 
-import static at.aau.serg.soot.SootAnalysisTest.CLASS_PATH;
+import static at.aau.serg.soot.SootAnalysisTests.CLASS_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
