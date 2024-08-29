@@ -44,6 +44,16 @@ public class JParser {
 
     }
 
+    /**
+     * Constructor for testing
+     * @param compilationUnit
+     * @param method
+     */
+    public JParser(CompilationUnit compilationUnit, MethodDeclaration method) {
+        this.compilationUnit = compilationUnit;
+        this.method = method;
+    }
+
     public void parse(Set<AnalysisResult> results) {
         System.out.println("----- Starting parsing -----");
         if(!method.getBody().isPresent()) throw new IllegalStateException("Unable to load method body");
