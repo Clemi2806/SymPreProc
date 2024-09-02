@@ -1,20 +1,24 @@
 package at.aau.serg.javaparser;
 
-import at.aau.serg.soot.analysisTypes.AnalysisResult;
-import at.aau.serg.soot.analysisTypes.ObjectFieldReference;
-import at.aau.serg.soot.analysisTypes.StaticMethodCall;
-import at.aau.serg.soot.analysisTypes.StaticVariableReference;
+import at.aau.serg.soot.analysisTypes.*;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import sootup.core.types.Type;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -102,9 +106,57 @@ public class JParser {
                         new UnsupportedOperationException("Unsupported reference type: " + ref.getReferenceType());
                         break;
                 }
+            } else if (result instanceof MarkedMethod) {
+                MarkedMethod markedMethod = (MarkedMethod) result;
+                parseMarkedMethodCall(markedMethod);
             }
         }
         System.out.println("----- Finished parsing -----");
+    }
+
+    private void parseMarkedMethodCall(MarkedMethod m) {
+        /*
+            1. Replace method call with an input variable
+            2. Create variables for all parameters of the call and add them to the output
+         */
+        Predicate<MethodCallExpr> isMarkedMethodCall = mc -> mc.getNameAsString().equals(m.getMethodName()) && mc.getArguments().size() == m.getParameterTypes().size();
+
+        int i = 0;
+        for(Type t : m.getParameterTypes()) {
+            String variableName = m.getNewVariableName() + "_arg" + i++;
+            method.getBody().get().getStatements().add(0, new ExpressionStmt(new VariableDeclarationExpr(new VariableDeclarator(getTypeAsJavaParserType(t), variableName, getDefaultValue(t)))));
+            changeReturnTypeToList();
+            changeReturnStatements(variableName);
+        }
+
+        Consumer<MethodCallExpr> transform = mc -> {
+            int c = 0;
+            NodeList<Statement> assignStmts = new NodeList<>();
+            for(Expression arg : mc.getArguments()) {
+                String variableName = m.getNewVariableName() + "_arg" + c++;
+                assignStmts.add(new ExpressionStmt(new AssignExpr(new NameExpr(variableName), arg, AssignExpr.Operator.ASSIGN)));
+            }
+            assert mc.getParentNode().isPresent() && mc.getParentNode().get().getParentNode().isPresent();
+            BlockStmt blockStmt = findEnclosingBlockStatement(mc).orElseThrow(() -> new IllegalStateException("No enclosing BlockStatement"));
+            int index = blockStmt.getStatements().indexOf(mc.getParentNode().get());
+            blockStmt.remove(mc.getParentNode().get());
+            blockStmt.getStatements().addAll(index, assignStmts);
+
+        };
+
+        method.findAll(MethodCallExpr.class).stream()
+                .filter(isMarkedMethodCall)
+                .forEach(transform);
+    }
+
+    private Optional<BlockStmt> findEnclosingBlockStatement(Node node) {
+        while(node.getParentNode().isPresent()) {
+            node = node.getParentNode().get();
+            if(node instanceof BlockStmt) {
+                return Optional.of((BlockStmt) node);
+            }
+        }
+        return Optional.empty();
     }
 
     private void parseObjectFieldRead(ObjectFieldReference ref) {
@@ -281,5 +333,47 @@ public class JParser {
                 return new StringLiteralExpr("1");
         }
         return null;
+    }
+
+    private com.github.javaparser.ast.type.Type getTypeAsJavaParserType(Type type) {
+        switch (type.toString()) {
+            case "boolean":
+                return com.github.javaparser.ast.type.PrimitiveType.booleanType();
+            case "byte":
+                return com.github.javaparser.ast.type.PrimitiveType.byteType();
+            case "char":
+                return com.github.javaparser.ast.type.PrimitiveType.charType();
+            case "short":
+                return com.github.javaparser.ast.type.PrimitiveType.shortType();
+            case "int":
+                return com.github.javaparser.ast.type.PrimitiveType.intType();
+            case "long":
+                return com.github.javaparser.ast.type.PrimitiveType.longType();
+            case "float":
+                return com.github.javaparser.ast.type.PrimitiveType.floatType();
+            case "double":
+                return com.github.javaparser.ast.type.PrimitiveType.doubleType();
+            default:
+                return new com.github.javaparser.ast.type.ClassOrInterfaceType(type.toString());
+        }
+    }
+
+
+    private Expression getDefaultValue(Type t) {
+        switch (t.toString()) {
+            case "boolean":
+                return new BooleanLiteralExpr(false);
+            case "byte":
+            case "char":
+            case "short":
+            case "int":
+            case "long":
+                return new IntegerLiteralExpr("0");
+            case "float":
+            case "double":
+                return new DoubleLiteralExpr(0);
+            default:
+                return new NullLiteralExpr();
+        }
     }
 }
