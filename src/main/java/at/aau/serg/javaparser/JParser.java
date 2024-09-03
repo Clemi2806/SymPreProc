@@ -15,6 +15,7 @@ import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import sootup.core.types.Type;
+import sootup.core.types.VoidType;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -121,14 +122,6 @@ public class JParser {
          */
         Predicate<MethodCallExpr> isMarkedMethodCall = mc -> mc.getNameAsString().equals(m.getMethodName()) && mc.getArguments().size() == m.getParameterTypes().size();
 
-        int i = 0;
-        for(Type t : m.getParameterTypes()) {
-            String variableName = m.getNewVariableName() + "_arg" + i++;
-            method.getBody().get().getStatements().add(0, new ExpressionStmt(new VariableDeclarationExpr(new VariableDeclarator(getTypeAsJavaParserType(t), variableName, getDefaultValue(t)))));
-            changeReturnTypeToList();
-            changeReturnStatements(variableName);
-        }
-
         Consumer<MethodCallExpr> transform = mc -> {
             int c = 0;
             NodeList<Statement> assignStmts = new NodeList<>();
@@ -136,17 +129,41 @@ public class JParser {
                 String variableName = m.getNewVariableName() + "_arg" + c++;
                 assignStmts.add(new ExpressionStmt(new AssignExpr(new NameExpr(variableName), arg, AssignExpr.Operator.ASSIGN)));
             }
-            assert mc.getParentNode().isPresent() && mc.getParentNode().get().getParentNode().isPresent();
+            assert mc.getParentNode().isPresent() && mc.getParentNode().isPresent() && mc.getParentNode().get().getParentNode().isPresent();
             BlockStmt blockStmt = findEnclosingBlockStatement(mc).orElseThrow(() -> new IllegalStateException("No enclosing BlockStatement"));
             int index = blockStmt.getStatements().indexOf(mc.getParentNode().get());
-            blockStmt.remove(mc.getParentNode().get());
             blockStmt.getStatements().addAll(index, assignStmts);
 
+
+            if(!(m.getReturnType() instanceof VoidType)) {
+                    Parameter newParam = new Parameter(getTypeAsJavaParserType(m.getReturnType()), m.getNewVariableName() + "_ret");
+                if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(m.getNewVariableName()) && p.getType().equals(getTypeAsJavaParserType(m.getReturnType())))) {
+                    method.addParameter(newParam);
+                }
+                if(mc.getParentNode().get() instanceof ExpressionStmt) {
+                    mc.getParentNode().get().remove();
+                } else {
+                    mc.replace(new NameExpr(newParam.getNameAsString()));
+                }
+            } else {
+                Node node = mc;
+                while(!node.remove()) node = node.getParentNode().orElseThrow(() -> new IllegalStateException("Unable to delete initial call"));
+            }
+
         };
+
 
         method.findAll(MethodCallExpr.class).stream()
                 .filter(isMarkedMethodCall)
                 .forEach(transform);
+
+        int i = 0;
+        for(Type t : m.getParameterTypes()) {
+            String variableName = m.getNewVariableName() + "_arg" + i++;
+            method.getBody().get().getStatements().add(0, new ExpressionStmt(new VariableDeclarationExpr(new VariableDeclarator(getTypeAsJavaParserType(t), variableName, getDefaultValue(t)))));
+            changeReturnTypeToList();
+            changeReturnStatements(variableName);
+        }
     }
 
     private Optional<BlockStmt> findEnclosingBlockStatement(Node node) {
@@ -368,8 +385,8 @@ public class JParser {
             case "short":
             case "int":
             case "long":
-                return new IntegerLiteralExpr("0");
             case "float":
+                return new IntegerLiteralExpr("0");
             case "double":
                 return new DoubleLiteralExpr(0);
             default:

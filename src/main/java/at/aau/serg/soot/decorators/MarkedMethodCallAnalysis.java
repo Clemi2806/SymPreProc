@@ -7,6 +7,7 @@ import at.aau.serg.soot.analysisTypes.MarkedMethod;
 import sootup.core.jimple.basic.Immediate;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.stmt.JInvokeStmt;
+import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.MethodSignature;
 
 import java.util.Arrays;
@@ -49,7 +50,7 @@ public class MarkedMethodCallAnalysis extends AnalysisDecorator {
         };
 
         return getStmtGraph().getStmts().stream()
-                .filter(JInvokeStmt.class::isInstance).map(JInvokeStmt.class::cast).map(JInvokeStmt::getInvokeExpr)
+                .filter(Stmt::containsInvokeExpr).map(Stmt::getInvokeExpr)
                 .filter(isMarkedMethod)
                 .filter(isParsable)
                 .map(toMarkedMethod)
