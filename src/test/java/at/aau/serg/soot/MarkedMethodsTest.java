@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 public class MarkedMethodsTest {
     @Test
     public void markedMethodsTest() {
-        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.markedMethods.A", "snippet"));
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.markedMethods.MM", "snippet"));
         Analysis analysis = analysisBuilder.markedMethodCall().build();
 
         try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
