@@ -112,6 +112,11 @@ public class JParser {
                 parseMarkedMethodCall(markedMethod);
             }
         }
+
+        // Clean up and remove unused method parameters
+        Predicate<Parameter> isUsed = p -> method.findAll(NameExpr.class).stream().anyMatch(n -> n.getNameAsString().equals(p.getNameAsString()));
+
+        method.getParameters().removeIf(isUsed.negate());
         System.out.println("----- Finished parsing -----");
     }
 
@@ -137,7 +142,7 @@ public class JParser {
 
             if(!(m.getReturnType() instanceof VoidType)) {
                     Parameter newParam = new Parameter(getTypeAsJavaParserType(m.getReturnType()), m.getNewVariableName() + "_ret");
-                if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(m.getNewVariableName()) && p.getType().equals(getTypeAsJavaParserType(m.getReturnType())))) {
+                if(method.getParameters().stream().noneMatch(p -> p.equals(newParam))) {
                     method.addParameter(newParam);
                 }
                 if(mc.getParentNode().get() instanceof ExpressionStmt) {
