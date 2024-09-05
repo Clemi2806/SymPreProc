@@ -14,6 +14,7 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import jdk.nashorn.internal.runtime.regexp.joni.constants.Arguments;
 import sootup.core.types.Type;
 import sootup.core.types.VoidType;
 
@@ -114,7 +115,7 @@ public class JParser {
         }
 
         // Clean up and remove unused method parameters
-        Predicate<Parameter> isUsed = p -> method.findAll(NameExpr.class).stream().anyMatch(n -> n.getNameAsString().equals(p.getNameAsString()));
+        Predicate<Parameter> isUsed = p -> !method.findAll(NameExpr.class,n -> n.getNameAsString().equals(p.getNameAsString())).isEmpty();
 
         method.getParameters().removeIf(isUsed.negate());
         System.out.println("----- Finished parsing -----");
@@ -319,7 +320,11 @@ public class JParser {
             if(returnStmt.getExpression().isPresent()) {
                 Expression exp = returnStmt.getExpression().get();
                 if(isObjectCreationExpr(exp)) {
-                    ((ObjectCreationExpr) exp).getArguments().add(new NameExpr(newVariableName));
+                    ObjectCreationExpr old = exp.asObjectCreationExpr();
+                    NodeList<Expression> args = old.getArguments();
+                    args.add(new NameExpr(newVariableName));
+                    ObjectCreationExpr objectCreationExpr = new ObjectCreationExpr(old.getScope().orElse(null), old.getType(), args);
+                    old.replace(objectCreationExpr);
                 } else {
                     returnStmt.setExpression(createObjectCreationExpr(exp, new NameExpr(newVariableName)));
                 }
