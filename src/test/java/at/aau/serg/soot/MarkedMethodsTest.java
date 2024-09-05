@@ -82,4 +82,25 @@ public class MarkedMethodsTest {
         }
 
     }
+
+    @Test
+    public void markedClassesTest() {
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.objects.UserMain", "snippet"));
+        Analysis analysis = analysisBuilder.markedMethodCall().build();
+
+        try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
+
+            Configurations configurationsMock = mock(Configurations.class);
+            when(configurationsMock.getPropertyAsStringArray("classes")).thenReturn(new String[]{"java.io.PrintStream", "testfiles.objects.User"});
+            configurationsClassMock.when(Configurations::getInstance).thenReturn(configurationsMock);
+            configurationsClassMock.when(Configurations::exists).thenReturn(true);
+
+            Set<AnalysisResult> results = analysis.analyse();
+
+            assertEquals(3, results.size());
+            assertEquals(1, results.stream().filter(x -> x.getNewVariableName().equals("M_User_getName")).count());
+            assertEquals(1, results.stream().filter(x -> x.getNewVariableName().equals("M_User_getAge")).count());
+            assertEquals(1, results.stream().filter(x -> x.getNewVariableName().equals("M_PrintStream_println")).count());
+        }
+    }
 }

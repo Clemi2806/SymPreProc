@@ -4,6 +4,7 @@ import at.aau.serg.cli.Configurations;
 import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.MarkedMethod;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import sootup.core.jimple.basic.Immediate;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.stmt.JInvokeStmt;
@@ -33,13 +34,16 @@ public class MarkedMethodCallAnalysis extends AnalysisDecorator {
 
     private Set<AnalysisResult> getMarkedMethodCalls() {
         if(!Configurations.exists()) return Collections.EMPTY_SET;
-        String[] markedMethods = Configurations.getInstance().getPropertyAsStringArray("methods");
-        if(markedMethods == null) return Collections.EMPTY_SET;
+        Configurations configurations = Configurations.getInstance();
+        String[] markedMethods = configurations.getPropertyAsStringArray("methods");
+        String[] markedClasses = configurations.getPropertyAsStringArray("classes");
+
+        if(markedMethods == null && markedClasses == null) return Collections.EMPTY_SET;
 
         Predicate<AbstractInvokeExpr> isMarkedMethod = invokeExpr -> {
             MethodSignature methodSignature = invokeExpr.getMethodSignature();
             String s = String.format("%s.%s", methodSignature.getDeclClassType().getFullyQualifiedName(), methodSignature.getSubSignature().getName());
-            return Arrays.stream(markedMethods).anyMatch(x -> x.equals(s));
+            return (markedMethods != null && Arrays.stream(markedMethods).anyMatch(x -> x.equals(s))) || (markedClasses != null && Arrays.stream(markedClasses).anyMatch(x -> x.equals(methodSignature.getDeclClassType().getFullyQualifiedName())));
         };
 
         Predicate<AbstractInvokeExpr> isParsable = aie -> isValidType(aie.getType()) && aie.getArgs().stream().allMatch(i -> isValidType(i.getType()));
