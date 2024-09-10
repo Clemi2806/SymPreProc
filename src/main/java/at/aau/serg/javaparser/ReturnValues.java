@@ -1,35 +1,32 @@
 package at.aau.serg.javaparser;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class ReturnValues {
-    Map<Class, Object> objects = new HashMap<>();
+public class ReturnValues implements Iterable<Object>{
+    private List<Object> values;
 
-    public ReturnValues() {}
-
-    public ReturnValues(Object... objects) {
-        Arrays.stream(objects).forEach(this::addObject);
+    public ReturnValues() {
+        this.values = new ArrayList<>();
     }
 
-    public ReturnValues(List<Object> objects) {
-        objects.forEach(this::addObject);
+    public ReturnValues(List<Object> values) {
+        this.values = values;
     }
 
-    public void addObject(Object object) {
-        if (object == null) return;
-        objects.put(object.getClass(), object);
+    public ReturnValues(Object... values) {
+        this.values = Arrays.asList(values);
     }
 
-    public Map<Class, Object> getObjectMap() {
-        return objects;
+    public List<Object> getValues() {
+        return Collections.unmodifiableList(values);
     }
 
-    public Set<Map.Entry<Class, Object>> getEntrySet() {
-        return objects.entrySet();
+    public int size() {
+        return values.size();
     }
 
-    public List<Object> getObjects() {
-        return new ArrayList<>(objects.values());
+    @Override
+    public Iterator<Object> iterator() {
+        return values.iterator();
     }
 }
