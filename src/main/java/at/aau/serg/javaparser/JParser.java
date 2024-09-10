@@ -167,8 +167,14 @@ public class JParser {
         }
         assert mc.getParentNode().isPresent() && mc.getParentNode().isPresent() && mc.getParentNode().get().getParentNode().isPresent();
         BlockStmt blockStmt = findEnclosingBlockStatement(mc).orElseThrow(() -> new IllegalStateException("No enclosing BlockStatement"));
-        int index = blockStmt.getStatements().indexOf(mc.getParentNode().get());
+        int index = getIndex(blockStmt, mc);
         blockStmt.getStatements().addAll(index, assignStmts);
+    }
+
+    private int getIndex(BlockStmt blockStmt, MethodCallExpr mc) {
+        Node n = mc.getParentNode().get();
+        while(!blockStmt.getStatements().contains(n)) n = n.getParentNode().get();
+        return blockStmt.getStatements().indexOf(n);
     }
 
     private Optional<BlockStmt> findEnclosingBlockStatement(Node node) {
