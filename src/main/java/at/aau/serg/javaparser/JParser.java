@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -122,27 +123,16 @@ public class JParser {
     }
 
     private void parseMarkedMethodCall(MarkedMethod m) {
-        /*
-            1. Replace method call with an input variable
-            2. Create variables for all parameters of the call and add them to the output
-         */
+        
         Predicate<MethodCallExpr> isMarkedMethodCall = mc -> mc.getNameAsString().equals(m.getMethodName()) && mc.getArguments().size() == m.getParameterTypes().size();
 
-        Consumer<MethodCallExpr> transform = mc -> {
-            int c = 0;
-            NodeList<Statement> assignStmts = new NodeList<>();
-            for(Expression arg : mc.getArguments()) {
-                String variableName = m.getNewVariableName() + "_arg" + c++;
-                assignStmts.add(new ExpressionStmt(new AssignExpr(new NameExpr(variableName), arg, AssignExpr.Operator.ASSIGN)));
-            }
-            assert mc.getParentNode().isPresent() && mc.getParentNode().isPresent() && mc.getParentNode().get().getParentNode().isPresent();
-            BlockStmt blockStmt = findEnclosingBlockStatement(mc).orElseThrow(() -> new IllegalStateException("No enclosing BlockStatement"));
-            int index = blockStmt.getStatements().indexOf(mc.getParentNode().get());
-            blockStmt.getStatements().addAll(index, assignStmts);
+        AtomicInteger counter = new AtomicInteger(0);
 
+        Consumer<MethodCallExpr> transform = mc -> {
+            processMethodArguments(m, mc, counter);
 
             if(!(m.getReturnType() instanceof VoidType)) {
-                    Parameter newParam = new Parameter(getTypeAsJavaParserType(m.getReturnType()), m.getNewVariableName() + "_ret");
+                Parameter newParam = new Parameter(getTypeAsJavaParserType(m.getReturnType()), m.getNewVariableName() + "_ret");
                 if(method.getParameters().stream().noneMatch(p -> p.equals(newParam))) {
                     method.addParameter(newParam);
                 }
@@ -156,20 +146,29 @@ public class JParser {
                 while(!node.remove()) node = node.getParentNode().orElseThrow(() -> new IllegalStateException("Unable to delete initial call"));
             }
 
+            counter.getAndIncrement();
         };
 
 
         method.findAll(MethodCallExpr.class).stream()
                 .filter(isMarkedMethodCall)
                 .forEach(transform);
+    }
 
-        int i = 0;
-        for(Type t : m.getParameterTypes()) {
-            String variableName = m.getNewVariableName() + "_arg" + i++;
-            method.getBody().get().getStatements().add(0, new ExpressionStmt(new VariableDeclarationExpr(new VariableDeclarator(getTypeAsJavaParserType(t), variableName, getDefaultValue(t)))));
+    private void processMethodArguments(MarkedMethod m, MethodCallExpr mc, AtomicInteger counter) {
+        NodeList<Statement> assignStmts = new NodeList<>();
+        for(int i = 0; i < mc.getArguments().size(); i++) {
+            Expression arg = mc.getArguments().get(i);
+            String variableName = m.getNewVariableName() + counter.get() + "_arg" + i;
+            assignStmts.add(new ExpressionStmt(new AssignExpr(new NameExpr(variableName), arg, AssignExpr.Operator.ASSIGN)));
+            method.getBody().get().getStatements().add(0, new ExpressionStmt(new VariableDeclarationExpr(new VariableDeclarator(getTypeAsJavaParserType(m.getParameterTypes().get(i)), variableName, getDefaultValue(m.getParameterTypes().get(i))))));
             changeReturnTypeToList();
             changeReturnStatements(variableName);
         }
+        assert mc.getParentNode().isPresent() && mc.getParentNode().isPresent() && mc.getParentNode().get().getParentNode().isPresent();
+        BlockStmt blockStmt = findEnclosingBlockStatement(mc).orElseThrow(() -> new IllegalStateException("No enclosing BlockStatement"));
+        int index = blockStmt.getStatements().indexOf(mc.getParentNode().get());
+        blockStmt.getStatements().addAll(index, assignStmts);
     }
 
     private Optional<BlockStmt> findEnclosingBlockStatement(Node node) {
