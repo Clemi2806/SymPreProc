@@ -12,6 +12,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * Finds calls to static methods and adds them to the analysis report
+ * TODO: Does it make sense to keep this around because MarkedMethods can do this more precisely
+ */
 public class StaticMethodCallAnalysis extends AnalysisDecorator{
     private static final List<String> EXCLUDED_SCOPES = Arrays.asList("java.lang", "java.util");
 

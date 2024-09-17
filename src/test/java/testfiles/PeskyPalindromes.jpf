@@ -1,0 +1,5 @@
+classpath=target/
+target=PeskyPalindromes
+symbolic.method=PeskyPalindromes.snippet(sym#sym)
+symbolic.listener=symbc.SymbolicListener
+symbolic.debug=true

@@ -18,6 +18,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * Finds references to fields of global objects that are written to in the method and adds them to the analysis report
+ */
 public class ObjectFieldWriteAnalysis extends AnalysisDecorator {
     public ObjectFieldWriteAnalysis(Analysis analysis) {
         super(analysis);
@@ -62,7 +65,7 @@ public class ObjectFieldWriteAnalysis extends AnalysisDecorator {
                 .filter(JAssignStmt.class::isInstance).map(JAssignStmt.class::cast)
                 .filter(s -> s.getLeftOp().equals(instanceFieldRef.getBase()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Oh no"))
+                .orElseThrow(() -> new IllegalStateException("Could not find name of object"))
                 .getRightOp()).getFieldSignature().getName();
     }
 }

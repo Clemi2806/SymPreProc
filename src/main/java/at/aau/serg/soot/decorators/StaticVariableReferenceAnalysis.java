@@ -17,6 +17,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * Finds uses of static variables (reads) and adds them to the analysis report
+ */
 public class StaticVariableReferenceAnalysis extends AnalysisDecorator{
     public StaticVariableReferenceAnalysis(Analysis analysis) {
         super(analysis);

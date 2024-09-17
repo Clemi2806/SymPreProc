@@ -19,6 +19,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * Finds all methods that are marked using the configuration file and adds them to the analysis report
+ */
 public class MarkedMethodCallAnalysis extends AnalysisDecorator {
 
     public MarkedMethodCallAnalysis(Analysis analysis) {

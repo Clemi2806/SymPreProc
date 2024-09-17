@@ -15,6 +15,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * Finds uses of static variables (writes) and adds them to the analysis report
+ */
 public class StaticVariableWriteAnalysis extends AnalysisDecorator {
 
     public StaticVariableWriteAnalysis(Analysis analysis) {
