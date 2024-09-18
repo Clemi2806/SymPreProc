@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
+        Configurations.reset();
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
         try {

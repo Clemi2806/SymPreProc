@@ -59,7 +59,6 @@ public class ObjectFieldWriteAnalysis extends AnalysisDecorator {
                 .collect(Collectors.toSet());
     }
 
-    // TODO: Fix: for static objects
     private String getNameOfObject(JInstanceFieldRef instanceFieldRef) {
         return ((JFieldRef) getStmtGraph().getStmts().stream()
                 .filter(JAssignStmt.class::isInstance).map(JAssignStmt.class::cast)

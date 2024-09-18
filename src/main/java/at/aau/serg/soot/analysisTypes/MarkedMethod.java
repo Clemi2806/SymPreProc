@@ -10,12 +10,22 @@ public class MarkedMethod extends AnalysisResult {
     private String methodName;
     private Type returnType;
     private List<Type> parameterTypes;
+    private boolean hasVarArgs;
 
     public MarkedMethod(String className, String methodName, Type returnType, List<Type> parameterTypes) {
         this.className = className;
         this.methodName = methodName;
         this.returnType = returnType;
         this.parameterTypes = parameterTypes;
+        this.hasVarArgs = false;
+    }
+
+    public MarkedMethod(String className, String methodName, Type returnType, List<Type> parameterTypes, boolean hasVarArgs) {
+        this.className = className;
+        this.methodName = methodName;
+        this.returnType = returnType;
+        this.parameterTypes = parameterTypes;
+        this.hasVarArgs = hasVarArgs;
     }
 
     public String getClassName() {
