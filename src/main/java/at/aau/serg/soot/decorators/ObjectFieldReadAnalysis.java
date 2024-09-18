@@ -4,6 +4,7 @@ import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.ObjectFieldReference;
 import at.aau.serg.soot.analysisTypes.ReferenceType;
+import at.aau.serg.utils.TypeAdapter;
 import sootup.core.jimple.common.expr.JSpecialInvokeExpr;
 import sootup.core.jimple.common.ref.JFieldRef;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
@@ -33,7 +34,7 @@ public class ObjectFieldReadAnalysis extends AnalysisDecorator{
     }
 
     private Set<AnalysisResult> getObjectFieldReads() {
-        Function<JInstanceFieldRef, ObjectFieldReference> mapToObjectFieldRef = ifr -> new ObjectFieldReference(ifr.getFieldSignature().getDeclClassType().getClassName(), getNameOfObject(ifr), ifr.getFieldSignature().getName(), ifr.getFieldSignature().getSubSignature().getType(), ReferenceType.READ);
+        Function<JInstanceFieldRef, ObjectFieldReference> mapToObjectFieldRef = ifr -> new ObjectFieldReference(ifr.getFieldSignature().getDeclClassType().getClassName(), getNameOfObject(ifr), ifr.getFieldSignature().getName(), new TypeAdapter(ifr.getFieldSignature().getSubSignature().getType()), ReferenceType.READ);
 
         // In bytecode, local objects are initialized using specialinvoke statements, thus to find if an object is local a specialinvoke stmt must be there
         Predicate<JInstanceFieldRef> isLocalObject = fr -> getStmtGraph().getStmts().stream()

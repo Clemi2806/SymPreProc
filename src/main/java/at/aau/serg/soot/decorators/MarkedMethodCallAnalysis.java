@@ -5,6 +5,7 @@ import at.aau.serg.javaparser.MethodNotFoundException;
 import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.MarkedMethod;
+import at.aau.serg.utils.TypeAdapter;
 import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import sootup.core.jimple.basic.Immediate;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
@@ -56,7 +57,7 @@ public class MarkedMethodCallAnalysis extends AnalysisDecorator {
         Function<AbstractInvokeExpr, MarkedMethod> toMarkedMethod = invokeExpr -> {
             MethodSignature methodSignature = invokeExpr.getMethodSignature();
             boolean hasVariableArguments = getView().getMethod(methodSignature).orElseThrow(() -> new IllegalStateException("Cannot check method for variable arguments")).getModifiers().contains(MethodModifier.VARARGS);
-            return new MarkedMethod(methodSignature.getDeclClassType().getClassName(), methodSignature.getName(), invokeExpr.getType(), invokeExpr.getArgs().stream().map(Immediate::getType).collect(Collectors.toList()), hasVariableArguments);
+            return new MarkedMethod(methodSignature.getDeclClassType().getClassName(), methodSignature.getName(), new TypeAdapter(invokeExpr.getType()), invokeExpr.getArgs().stream().map(Immediate::getType).map(TypeAdapter::new).collect(Collectors.toList()), hasVariableArguments);
         };
 
         return getStmtGraph().getStmts().stream()

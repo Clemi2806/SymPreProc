@@ -1,5 +1,6 @@
 package at.aau.serg.soot.analysisTypes;
 
+import at.aau.serg.utils.TypeAdapter;
 import sootup.core.types.Type;
 
 import java.util.Objects;
@@ -8,10 +9,10 @@ public class ObjectFieldReference extends AnalysisResult{
     private String className;
     private String objectName;
     private String fieldName;
-    private Type type;
+    private TypeAdapter type;
     private ReferenceType referenceType;
 
-    public ObjectFieldReference(String className, String objectName, String fieldName, Type type, ReferenceType referenceType) {
+    public ObjectFieldReference(String className, String objectName, String fieldName, TypeAdapter type, ReferenceType referenceType) {
         this.className = className;
         this.objectName = objectName;
         this.fieldName = fieldName;
@@ -22,7 +23,7 @@ public class ObjectFieldReference extends AnalysisResult{
     public String getClassName() {return className;}
     public String getFieldName() {return fieldName;}
     public String getObjectName() {return objectName;}
-    public Type getType() {return type;}
+    public TypeAdapter getType() {return type;}
     public ReferenceType getReferenceType() {return referenceType;}
 
     @Override
@@ -54,25 +55,4 @@ public class ObjectFieldReference extends AnalysisResult{
                 '}';
     }
 
-    public com.github.javaparser.ast.type.Type getReturnTypeAsJavaParserType() {
-        switch (type.toString()) {
-            case "boolean":
-                return com.github.javaparser.ast.type.PrimitiveType.booleanType();
-            case "byte":
-                return com.github.javaparser.ast.type.PrimitiveType.byteType();
-            case "char":
-                return com.github.javaparser.ast.type.PrimitiveType.charType();
-            case "short":
-                return com.github.javaparser.ast.type.PrimitiveType.shortType();
-            case "int":
-                return com.github.javaparser.ast.type.PrimitiveType.intType();
-            case "long":
-                return com.github.javaparser.ast.type.PrimitiveType.longType();
-            case "float":
-                return com.github.javaparser.ast.type.PrimitiveType.floatType();
-            case "double":
-                return com.github.javaparser.ast.type.PrimitiveType.doubleType();
-        }
-        return null;
-    }
 }

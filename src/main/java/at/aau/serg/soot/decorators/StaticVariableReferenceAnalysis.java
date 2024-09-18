@@ -4,6 +4,7 @@ import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.ReferenceType;
 import at.aau.serg.soot.analysisTypes.StaticVariableReference;
+import at.aau.serg.utils.TypeAdapter;
 import sootup.core.jimple.common.ref.JFieldRef;
 import sootup.core.jimple.common.ref.JStaticFieldRef;
 import sootup.core.jimple.common.stmt.Stmt;
@@ -42,7 +43,7 @@ public class StaticVariableReferenceAnalysis extends AnalysisDecorator{
         Predicate<JFieldRef> isStaticFieldRef = fr -> fr instanceof JStaticFieldRef;
         Predicate<JFieldRef> isParsable = fr -> isValidType(fr.getType());
 
-        Function<FieldSignature, StaticVariableReference> convertToStaticVariableRef = fieldSignature -> new StaticVariableReference(fieldSignature.getDeclClassType().getClassName(), fieldSignature.getName(), fieldSignature.getType(), ReferenceType.READ);
+        Function<FieldSignature, StaticVariableReference> convertToStaticVariableRef = fieldSignature -> new StaticVariableReference(fieldSignature.getDeclClassType().getClassName(), fieldSignature.getName(), new TypeAdapter(fieldSignature.getType()), ReferenceType.READ);
 
         return getStmtGraph().getStmts().stream()
                 .filter(Stmt::containsFieldRef)

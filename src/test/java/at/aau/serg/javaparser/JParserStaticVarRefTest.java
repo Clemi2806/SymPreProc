@@ -3,6 +3,7 @@ package at.aau.serg.javaparser;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.ReferenceType;
 import at.aau.serg.soot.analysisTypes.StaticVariableReference;
+import at.aau.serg.utils.TypeAdapter;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.NameExpr;
@@ -23,7 +24,7 @@ public class JParserStaticVarRefTest {
         JParser parser = assertDoesNotThrow(() -> new JParser("src/test/resources/javaparser", "StaticVariableReferenceWrite", "snippet"));
         Set<AnalysisResult> results = new HashSet<>();
 
-        results.add(new StaticVariableReference("B", "x", PrimitiveType.getInt(), ReferenceType.WRITE));
+        results.add(new StaticVariableReference("B", "x", new TypeAdapter(PrimitiveType.getInt()), ReferenceType.WRITE));
 
         assertDoesNotThrow(() -> parser.parse(results));
 
@@ -50,7 +51,7 @@ public class JParserStaticVarRefTest {
         JParser parser = assertDoesNotThrow(() -> new JParser("src/test/resources/javaparser", "StaticVariableReferenceRead", "snippet"));
         Set<AnalysisResult> results = new HashSet<>();
 
-        results.add(new StaticVariableReference("B", "x", PrimitiveType.getInt(), ReferenceType.READ));
+        results.add(new StaticVariableReference("B", "x", new TypeAdapter(PrimitiveType.getInt()), ReferenceType.READ));
 
         assertDoesNotThrow(() -> parser.parse(results));
 

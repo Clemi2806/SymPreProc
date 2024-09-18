@@ -30,7 +30,7 @@ public class MarkedMethodsTest {
             assertEquals(1, results.size());
             MarkedMethod mm = (MarkedMethod) results.iterator().next();
             assertEquals(1, mm.getParameterTypes().size());
-            assertEquals("java.lang.String",mm.getParameterTypes().get(0).toString());
+            assertEquals("java.lang.String",mm.getParameterTypes().get(0).asJavaParserType().toString());
             assertEquals("M_PrintStream_println", mm.getNewVariableName());
         }
 
@@ -53,8 +53,8 @@ public class MarkedMethodsTest {
             assertEquals(1, results.size());
             MarkedMethod mm = (MarkedMethod) results.iterator().next();
             assertEquals(2, mm.getParameterTypes().size());
-            assertEquals("float",mm.getParameterTypes().get(0).toString());
-            assertEquals("float",mm.getParameterTypes().get(1).toString());
+            assertEquals("float",mm.getParameterTypes().get(0).asJavaParserType().toString());
+            assertEquals("float",mm.getParameterTypes().get(1).asJavaParserType().toString());
             assertEquals("M_Math_copySign", mm.getNewVariableName());
         }
 
@@ -77,7 +77,7 @@ public class MarkedMethodsTest {
             assertEquals(1, results.size());
             MarkedMethod mm = (MarkedMethod) results.iterator().next();
             assertEquals(1, mm.getParameterTypes().size());
-            assertEquals("int",mm.getParameterTypes().get(0).toString());
+            assertEquals("int",mm.getParameterTypes().get(0).asJavaParserType().toString());
             assertEquals("M_ObjectMethod_setX", mm.getNewVariableName());
         }
 

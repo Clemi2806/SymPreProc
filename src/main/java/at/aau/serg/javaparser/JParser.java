@@ -1,6 +1,7 @@
 package at.aau.serg.javaparser;
 
 import at.aau.serg.soot.analysisTypes.*;
+import at.aau.serg.utils.TypeAdapter;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
@@ -14,7 +15,8 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.Arguments;
+import com.github.javaparser.ast.type.PrimitiveType;
+import com.github.javaparser.resolution.types.ResolvedType;
 import sootup.core.types.Type;
 import sootup.core.types.VoidType;
 
@@ -124,15 +126,15 @@ public class JParser {
 
     private void parseMarkedMethodCall(MarkedMethod m) {
         
-        Predicate<MethodCallExpr> isMarkedMethodCall = mc -> mc.getNameAsString().equals(m.getMethodName()) && mc.getArguments().size() == m.getParameterTypes().size();
+        Predicate<MethodCallExpr> isMarkedMethodCall = mc -> mc.getNameAsString().equals(m.getMethodName()) && (m.hasVarArgs() || mc.getArguments().size() == m.getParameterTypes().size());
 
         AtomicInteger counter = new AtomicInteger(0);
 
         Consumer<MethodCallExpr> transform = mc -> {
             processMethodArguments(m, mc, counter);
 
-            if(!(m.getReturnType() instanceof VoidType)) {
-                Parameter newParam = new Parameter(getTypeAsJavaParserType(m.getReturnType()), m.getNewVariableName() + "_ret");
+            if(!(m.getReturnType().asSootType() instanceof VoidType)) {
+                Parameter newParam = new Parameter(m.getReturnType().asJavaParserType(), m.getNewVariableName() + "_ret");
                 if(method.getParameters().stream().noneMatch(p -> p.equals(newParam))) {
                     method.addParameter(newParam);
                 }
@@ -161,7 +163,19 @@ public class JParser {
             Expression arg = mc.getArguments().get(i);
             String variableName = m.getNewVariableName() + counter.get() + "_arg" + i;
             assignStmts.add(new ExpressionStmt(new AssignExpr(new NameExpr(variableName), arg, AssignExpr.Operator.ASSIGN)));
-            method.getBody().get().getStatements().add(0, new ExpressionStmt(new VariableDeclarationExpr(new VariableDeclarator(getTypeAsJavaParserType(m.getParameterTypes().get(i)), variableName, getDefaultValue(m.getParameterTypes().get(i))))));
+
+            if(m.hasVarArgs() && i >= m.getParameterTypes().size()-1) {
+                // now we have reached the varargs
+                TypeAdapter argType;
+                if(arg instanceof LiteralExpr) {
+                    argType = new TypeAdapter(arg.asLiteralExpr());
+                } else {
+                    argType = new TypeAdapter(arg.calculateResolvedType());
+                }
+                method.getBody().get().getStatements().add(0, new ExpressionStmt(new VariableDeclarationExpr(new VariableDeclarator(argType.asJavaParserType(), variableName, argType.getDefaultJavaParserExpression()))));
+            }else {
+                method.getBody().get().getStatements().add(0, new ExpressionStmt(new VariableDeclarationExpr(new VariableDeclarator(m.getParameterTypes().get(i).asJavaParserType(), variableName, m.getParameterTypes().get(i).getDefaultJavaParserExpression()))));
+            }
             changeReturnTypeToList();
             changeReturnStatements(variableName);
         }
@@ -188,8 +202,8 @@ public class JParser {
     }
 
     private void parseObjectFieldRead(ObjectFieldReference ref) {
-        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(ref.getNewVariableName()) && p.getType().equals(ref.getReturnTypeAsJavaParserType()))) {
-            Parameter newParam = new Parameter(ref.getReturnTypeAsJavaParserType(), ref.getNewVariableName());
+        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(ref.getNewVariableName()) && p.getType().equals(ref.getType().asJavaParserType()))) {
+            Parameter newParam = new Parameter(ref.getType().asJavaParserType(), ref.getNewVariableName());
             method.addParameter(newParam);
         }
 
@@ -209,8 +223,8 @@ public class JParser {
 
     private void parseObjectFieldWrite(ObjectFieldReference ref) {
         //throw new UnsupportedOperationException("Not implemented yet");
-        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(ref.getNewVariableName()) && p.getType().equals(ref.getReturnTypeAsJavaParserType()))) {
-            Parameter newParam = new Parameter(ref.getReturnTypeAsJavaParserType(), ref.getNewVariableName());
+        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(ref.getNewVariableName()) && p.getType().equals(ref.getType().asJavaParserType()))) {
+            Parameter newParam = new Parameter(ref.getType().asJavaParserType(), ref.getNewVariableName());
             method.addParameter(newParam);
         }
 
@@ -228,8 +242,8 @@ public class JParser {
     private void parseStaticVariableWrite(StaticVariableReference staticVariableWrite) {
 
         // Add new parameter if parameter does not exist yet
-        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(staticVariableWrite.getNewVariableName()) && p.getType().equals(staticVariableWrite.getReturnTypeAsJavaParserType()))) {
-            Parameter newParam = new Parameter(staticVariableWrite.getReturnTypeAsJavaParserType(), staticVariableWrite.getNewVariableName());
+        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(staticVariableWrite.getNewVariableName()) && p.getType().equals(staticVariableWrite.getType().asJavaParserType()))) {
+            Parameter newParam = new Parameter(staticVariableWrite.getType().asJavaParserType(), staticVariableWrite.getNewVariableName());
             method.addParameter(newParam);
         }
 
@@ -251,8 +265,8 @@ public class JParser {
     // TODO: Fix method pipeline to only lookup static variable reads not writes
     private void parseStaticVariableReference(StaticVariableReference staticVariableReference) {
         // Add new parameter if parameter does not exist yet
-        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(staticVariableReference.getNewVariableName()) && p.getType().equals(staticVariableReference.getReturnTypeAsJavaParserType()))) {
-            Parameter newParam = new Parameter(staticVariableReference.getReturnTypeAsJavaParserType(), staticVariableReference.getNewVariableName());
+        if(method.getParameters().stream().noneMatch(p -> p.getNameAsString().equals(staticVariableReference.getNewVariableName()) && p.getType().equals(staticVariableReference.getType().asJavaParserType()))) {
+            Parameter newParam = new Parameter(staticVariableReference.getType().asJavaParserType(), staticVariableReference.getNewVariableName());
             method.addParameter(newParam);
         }
 
@@ -268,7 +282,7 @@ public class JParser {
     }
 
     private void parseStaticMethodCall(StaticMethodCall staticMethodCall) {
-        method.addParameter(staticMethodCall.getReturnTypeAsJavaParserType(), staticMethodCall.getNewVariableName());
+        method.addParameter(staticMethodCall.getReturnType().asJavaParserType(), staticMethodCall.getNewVariableName());
         // remove all calls to method with new parameter
         method.getBody().get().findAll(MethodCallExpr.class).forEach(callExpr -> {
             if (callExpr.getScope().isPresent() && callExpr.getScope().get().toString().equals(staticMethodCall.getClassName())) {
@@ -365,47 +379,5 @@ public class JParser {
                 return new StringLiteralExpr("1");
         }
         return null;
-    }
-
-    private com.github.javaparser.ast.type.Type getTypeAsJavaParserType(Type type) {
-        switch (type.toString()) {
-            case "boolean":
-                return com.github.javaparser.ast.type.PrimitiveType.booleanType();
-            case "byte":
-                return com.github.javaparser.ast.type.PrimitiveType.byteType();
-            case "char":
-                return com.github.javaparser.ast.type.PrimitiveType.charType();
-            case "short":
-                return com.github.javaparser.ast.type.PrimitiveType.shortType();
-            case "int":
-                return com.github.javaparser.ast.type.PrimitiveType.intType();
-            case "long":
-                return com.github.javaparser.ast.type.PrimitiveType.longType();
-            case "float":
-                return com.github.javaparser.ast.type.PrimitiveType.floatType();
-            case "double":
-                return com.github.javaparser.ast.type.PrimitiveType.doubleType();
-            default:
-                return new com.github.javaparser.ast.type.ClassOrInterfaceType(type.toString());
-        }
-    }
-
-
-    private Expression getDefaultValue(Type t) {
-        switch (t.toString()) {
-            case "boolean":
-                return new BooleanLiteralExpr(false);
-            case "byte":
-            case "char":
-            case "short":
-            case "int":
-            case "long":
-            case "float":
-                return new IntegerLiteralExpr("0");
-            case "double":
-                return new DoubleLiteralExpr(0);
-            default:
-                return new NullLiteralExpr();
-        }
     }
 }

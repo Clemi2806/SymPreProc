@@ -1,5 +1,6 @@
 package at.aau.serg.soot.analysisTypes;
 
+import at.aau.serg.utils.TypeAdapter;
 import com.github.javaparser.ast.type.Type;
 import sootup.core.types.PrimitiveType;
 
@@ -7,10 +8,10 @@ import java.util.Objects;
 
 public class StaticMethodCall extends AnalysisResult{
     private String methodName;
-    private PrimitiveType returnType;
+    private TypeAdapter returnType;
     private String className;
 
-    public StaticMethodCall(String className, String methodName, PrimitiveType returnType) {
+    public StaticMethodCall(String className, String methodName, TypeAdapter returnType) {
         this.className = className;
         this.methodName = methodName;
         this.returnType = returnType;
@@ -41,7 +42,7 @@ public class StaticMethodCall extends AnalysisResult{
         return methodName;
     }
 
-    public PrimitiveType getReturnType() {
+    public TypeAdapter getReturnType() {
         return returnType;
     }
 
@@ -51,28 +52,6 @@ public class StaticMethodCall extends AnalysisResult{
 
     public String getCallString() {
         return className + "." + methodName;
-    }
-
-    public Type getReturnTypeAsJavaParserType() {
-        switch (returnType.getName()) {
-            case "boolean":
-                return com.github.javaparser.ast.type.PrimitiveType.booleanType();
-            case "byte":
-                return com.github.javaparser.ast.type.PrimitiveType.byteType();
-            case "char":
-                return com.github.javaparser.ast.type.PrimitiveType.charType();
-            case "short":
-                return com.github.javaparser.ast.type.PrimitiveType.shortType();
-            case "int":
-                return com.github.javaparser.ast.type.PrimitiveType.intType();
-            case "long":
-                return com.github.javaparser.ast.type.PrimitiveType.longType();
-            case "float":
-                return com.github.javaparser.ast.type.PrimitiveType.floatType();
-            case "double":
-                return com.github.javaparser.ast.type.PrimitiveType.doubleType();
-        }
-        return null;
     }
 
     @Override

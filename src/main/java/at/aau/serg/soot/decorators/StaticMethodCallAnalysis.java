@@ -3,6 +3,7 @@ package at.aau.serg.soot.decorators;
 import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.StaticMethodCall;
+import at.aau.serg.utils.TypeAdapter;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.types.PrimitiveType;
 import sootup.java.core.JavaSootMethod;
@@ -37,7 +38,7 @@ public class StaticMethodCallAnalysis extends AnalysisDecorator{
         Predicate<JavaSootMethod> isNotMethodOfSameClass = method -> !method.getDeclaringClassType().equals(getMethod().getDeclaringClassType());
 
         Function<MethodSignature, JavaSootMethod> getSootMethodUsingSignature = signature -> getView().getMethod(signature).orElseThrow(() ->  new RuntimeException("Method " + signature.getName() + " not found"));
-        Function<JavaSootMethod, StaticMethodCall> convertToStaticMethodCall = method -> new StaticMethodCall(method.getDeclaringClassType().getClassName(), method.getName(), (PrimitiveType) method.getReturnType());
+        Function<JavaSootMethod, StaticMethodCall> convertToStaticMethodCall = method -> new StaticMethodCall(method.getDeclaringClassType().getClassName(), method.getName(),new TypeAdapter((PrimitiveType) method.getReturnType()));
 
         return getCallGraph().callsFrom(getMethod().getSignature()).stream()
                 .map(getSootMethodUsingSignature)

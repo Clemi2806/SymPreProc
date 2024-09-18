@@ -3,6 +3,7 @@ package at.aau.serg.soot;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.StaticMethodCall;
 import at.aau.serg.soot.decorators.StaticMethodCallAnalysis;
+import at.aau.serg.utils.TypeAdapter;
 import org.junit.jupiter.api.Test;
 import sootup.core.types.PrimitiveType;
 
@@ -24,6 +25,6 @@ public class StaticMethodCallTest {
 
         assertEquals(1, calls.size());
         assertTrue((calls.iterator().next() instanceof StaticMethodCall));
-        assertEquals(new StaticMethodCall("B", "x", PrimitiveType.getInt()), calls.iterator().next());
+        assertEquals(new StaticMethodCall("B", "x", new TypeAdapter(PrimitiveType.getInt())), calls.iterator().next());
     }
 }

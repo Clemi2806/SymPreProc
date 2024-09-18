@@ -4,6 +4,7 @@ import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.ReferenceType;
 import at.aau.serg.soot.analysisTypes.StaticVariableReference;
 import at.aau.serg.soot.decorators.StaticVariableReferenceAnalysis;
+import at.aau.serg.utils.TypeAdapter;
 import org.junit.jupiter.api.Test;
 import sootup.core.types.PrimitiveType;
 
@@ -25,7 +26,7 @@ public class StaticVariableRefTest {
 
         assertEquals(1, references.size());
         assertTrue((references.iterator().next() instanceof StaticVariableReference));
-        StaticVariableReference expected = new StaticVariableReference("B", "y", PrimitiveType.getInt(), ReferenceType.READ);
+        StaticVariableReference expected = new StaticVariableReference("B", "y", new TypeAdapter(PrimitiveType.getInt()), ReferenceType.READ);
 
         assertEquals(expected, references.iterator().next());
     }
@@ -38,7 +39,7 @@ public class StaticVariableRefTest {
         Set<AnalysisResult> results = analysis.analyse();
 
         assertEquals(1, results.size());
-        assertEquals(new StaticVariableReference("B", "x", PrimitiveType.getInt(), ReferenceType.WRITE), results.iterator().next());
+        assertEquals(new StaticVariableReference("B", "x", new TypeAdapter(PrimitiveType.getInt()), ReferenceType.WRITE), results.iterator().next());
     }
 
     @Test

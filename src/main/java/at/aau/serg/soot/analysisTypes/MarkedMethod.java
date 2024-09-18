@@ -1,5 +1,6 @@
 package at.aau.serg.soot.analysisTypes;
 
+import at.aau.serg.utils.TypeAdapter;
 import sootup.core.types.Type;
 
 import java.util.List;
@@ -8,11 +9,11 @@ import java.util.Objects;
 public class MarkedMethod extends AnalysisResult {
     private String className;
     private String methodName;
-    private Type returnType;
-    private List<Type> parameterTypes;
+    private TypeAdapter returnType;
+    private List<TypeAdapter> parameterTypes;
     private boolean hasVarArgs;
 
-    public MarkedMethod(String className, String methodName, Type returnType, List<Type> parameterTypes) {
+    public MarkedMethod(String className, String methodName, TypeAdapter returnType, List<TypeAdapter> parameterTypes) {
         this.className = className;
         this.methodName = methodName;
         this.returnType = returnType;
@@ -20,7 +21,7 @@ public class MarkedMethod extends AnalysisResult {
         this.hasVarArgs = false;
     }
 
-    public MarkedMethod(String className, String methodName, Type returnType, List<Type> parameterTypes, boolean hasVarArgs) {
+    public MarkedMethod(String className, String methodName, TypeAdapter returnType, List<TypeAdapter> parameterTypes, boolean hasVarArgs) {
         this.className = className;
         this.methodName = methodName;
         this.returnType = returnType;
@@ -36,12 +37,16 @@ public class MarkedMethod extends AnalysisResult {
         return methodName;
     }
 
-    public Type getReturnType() {
+    public TypeAdapter getReturnType() {
         return returnType;
     }
 
-    public List<Type> getParameterTypes() {
+    public List<TypeAdapter> getParameterTypes() {
         return parameterTypes;
+    }
+
+    public boolean hasVarArgs() {
+        return hasVarArgs;
     }
 
     @Override

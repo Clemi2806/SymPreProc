@@ -1,5 +1,6 @@
 package at.aau.serg.soot.analysisTypes;
 
+import at.aau.serg.utils.TypeAdapter;
 import sootup.core.types.Type;
 
 import java.util.Objects;
@@ -7,10 +8,10 @@ import java.util.Objects;
 public class StaticVariableReference extends AnalysisResult {
     private String className;
     private String variableName;
-    private Type type;
+    private TypeAdapter type;
     private ReferenceType referenceType;
 
-    public StaticVariableReference(String className, String variableName, Type type, ReferenceType referenceType) {
+    public StaticVariableReference(String className, String variableName, TypeAdapter type, ReferenceType referenceType) {
         this.className = className;
         this.variableName = variableName;
         this.type = type;
@@ -29,7 +30,7 @@ public class StaticVariableReference extends AnalysisResult {
         return variableName;
     }
 
-    public Type getType() {
+    public TypeAdapter getType() {
         return type;
     }
 
@@ -55,29 +56,6 @@ public class StaticVariableReference extends AnalysisResult {
     public int hashCode() {
         return Objects.hash(className, variableName, type, referenceType);
     }
-
-    public com.github.javaparser.ast.type.Type getReturnTypeAsJavaParserType() {
-        switch (type.toString()) {
-            case "boolean":
-                return com.github.javaparser.ast.type.PrimitiveType.booleanType();
-            case "byte":
-                return com.github.javaparser.ast.type.PrimitiveType.byteType();
-            case "char":
-                return com.github.javaparser.ast.type.PrimitiveType.charType();
-            case "short":
-                return com.github.javaparser.ast.type.PrimitiveType.shortType();
-            case "int":
-                return com.github.javaparser.ast.type.PrimitiveType.intType();
-            case "long":
-                return com.github.javaparser.ast.type.PrimitiveType.longType();
-            case "float":
-                return com.github.javaparser.ast.type.PrimitiveType.floatType();
-            case "double":
-                return com.github.javaparser.ast.type.PrimitiveType.doubleType();
-        }
-        return null;
-    }
-
     @Override
     public String getNewVariableName() {
         return "V"+className+variableName;

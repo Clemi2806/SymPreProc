@@ -4,6 +4,7 @@ import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.ReferenceType;
 import at.aau.serg.soot.analysisTypes.StaticVariableReference;
+import at.aau.serg.utils.TypeAdapter;
 import sootup.core.jimple.common.ref.JFieldRef;
 import sootup.core.jimple.common.ref.JStaticFieldRef;
 import sootup.core.jimple.common.stmt.JAssignStmt;
@@ -32,7 +33,7 @@ public class StaticVariableWriteAnalysis extends AnalysisDecorator {
     }
 
     private Set<StaticVariableReference> getStaticVariableWrites() {
-        Function<FieldSignature, StaticVariableReference> convertToStaticVariableWrite = fs -> new StaticVariableReference(fs.getDeclClassType().getClassName(),fs.getName(), fs.getType(), ReferenceType.WRITE);
+        Function<FieldSignature, StaticVariableReference> convertToStaticVariableWrite = fs -> new StaticVariableReference(fs.getDeclClassType().getClassName(),fs.getName(), new TypeAdapter(fs.getType()), ReferenceType.WRITE);
 
         Predicate<JStaticFieldRef> isParsable = fr -> isValidType(fr.getType());
 
