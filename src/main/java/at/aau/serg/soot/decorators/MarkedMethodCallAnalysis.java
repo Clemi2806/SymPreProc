@@ -36,17 +36,17 @@ public class MarkedMethodCallAnalysis extends AnalysisDecorator {
     }
 
     private Set<AnalysisResult> getMarkedMethodCalls() {
-        if(!Configurations.exists()) return Collections.EMPTY_SET;
+        if(!Configurations.exists()) return Collections.emptySet();
         Configurations configurations = Configurations.getInstance();
         String[] markedMethods = configurations.getPropertyAsStringArray("methods");
         String[] markedClasses = configurations.getPropertyAsStringArray("classes");
 
-        if(markedMethods == null && markedClasses == null) return Collections.EMPTY_SET;
+        if(markedMethods == null && markedClasses == null) return Collections.emptySet();
 
         Predicate<AbstractInvokeExpr> isMarkedMethod = invokeExpr -> {
             MethodSignature methodSignature = invokeExpr.getMethodSignature();
             String s = String.format("%s.%s", methodSignature.getDeclClassType().getFullyQualifiedName(), methodSignature.getSubSignature().getName());
-            return (markedMethods != null && Arrays.stream(markedMethods).anyMatch(x -> x.equals(s))) || (markedClasses != null && Arrays.stream(markedClasses).anyMatch(x -> x.equals(methodSignature.getDeclClassType().getFullyQualifiedName())));
+            return (markedMethods != null && Arrays.asList(markedMethods).contains(s)) || (markedClasses != null && Arrays.stream(markedClasses).anyMatch(x -> x.equals(methodSignature.getDeclClassType().getFullyQualifiedName())));
         };
 
         Predicate<AbstractInvokeExpr> isParsable = aie -> isValidType(aie.getType()) && aie.getArgs().stream().allMatch(i -> isValidType(i.getType()));

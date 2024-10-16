@@ -14,7 +14,6 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import sootup.core.types.VoidType;
 
 import java.io.*;
@@ -92,8 +91,7 @@ public class JParser {
                         parseStaticVariableWrite(ref);
                         break;
                     default:
-                        new UnsupportedOperationException("Unsupported reference type: " + ref.getReferenceType());
-                        break;
+                        throw new UnsupportedOperationException("Unsupported reference type: " + ref.getReferenceType());
                 }
             } else if (result instanceof ObjectFieldReference) {
                 ObjectFieldReference ref = (ObjectFieldReference) result;
@@ -105,8 +103,7 @@ public class JParser {
                         parseObjectFieldWrite(ref);
                         break;
                     default:
-                        new UnsupportedOperationException("Unsupported reference type: " + ref.getReferenceType());
-                        break;
+                        throw new UnsupportedOperationException("Unsupported reference type: " + ref.getReferenceType());
                 }
             } else if (result instanceof MarkedMethod) {
                 MarkedMethod markedMethod = (MarkedMethod) result;
@@ -301,7 +298,7 @@ public class JParser {
                         new MethodCallExpr(
                                 callExpr.getScope().orElse(null),
                                 callExpr.getNameAsString(),
-                                new NodeList<Expression>(
+                                new NodeList<>(
                                         method.getParameters()
                                                 .stream().map(JParser::convertParameter)
                                                 .collect(Collectors.toList()))));
@@ -324,7 +321,7 @@ public class JParser {
 
     private void changeReturnTypeToList() {
         if(method.getType().toString().equals("ReturnValues")) return;
-        method.setType(new ClassOrInterfaceType("ReturnValues"));
+        method.setType(StaticJavaParser.parseClassOrInterfaceType("ReturnValues"));
     }
 
     private void changeReturnStatements(String newVariableName) {
@@ -356,7 +353,7 @@ public class JParser {
     }
 
     private ObjectCreationExpr createObjectCreationExpr(Expression... expressions) {
-        return new ObjectCreationExpr(null, new ClassOrInterfaceType("ReturnValues"),new NodeList<>(expressions));
+        return new ObjectCreationExpr(null, StaticJavaParser.parseClassOrInterfaceType("ReturnValues"),new NodeList<>(expressions));
     }
 
     protected static Expression convertParameter(Parameter parameter) {
