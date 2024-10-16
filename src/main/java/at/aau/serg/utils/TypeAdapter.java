@@ -7,7 +7,6 @@ import sootup.core.signatures.PackageName;
 import sootup.core.types.*;
 import sootup.java.core.types.JavaClassType;
 
-import java.lang.reflect.Array;
 import java.util.Objects;
 
 public class TypeAdapter {

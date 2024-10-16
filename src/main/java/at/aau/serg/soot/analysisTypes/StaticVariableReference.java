@@ -1,15 +1,14 @@
 package at.aau.serg.soot.analysisTypes;
 
 import at.aau.serg.utils.TypeAdapter;
-import sootup.core.types.Type;
 
 import java.util.Objects;
 
 public class StaticVariableReference extends AnalysisResult {
-    private String className;
-    private String variableName;
-    private TypeAdapter type;
-    private ReferenceType referenceType;
+    private final String className;
+    private final String variableName;
+    private final TypeAdapter type;
+    private final ReferenceType referenceType;
 
     public StaticVariableReference(String className, String variableName, TypeAdapter type, ReferenceType referenceType) {
         this.className = className;

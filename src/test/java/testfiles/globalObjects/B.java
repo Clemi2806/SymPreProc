@@ -1,7 +1,7 @@
 package testfiles.globalObjects;
 
 public class B {
-    private int b;
+    private final int b;
 
     public B() {
         this.b = (int) (Math.random() * 100);

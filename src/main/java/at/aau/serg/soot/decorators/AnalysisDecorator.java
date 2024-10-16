@@ -11,7 +11,7 @@ import sootup.java.core.views.JavaView;
 import java.util.Set;
 
 public abstract class AnalysisDecorator implements Analysis {
-    private Analysis analysis;
+    private final Analysis analysis;
 
     public AnalysisDecorator(Analysis analysis) {
         this.analysis = analysis;

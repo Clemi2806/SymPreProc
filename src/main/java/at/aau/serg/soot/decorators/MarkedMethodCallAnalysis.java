@@ -1,15 +1,12 @@
 package at.aau.serg.soot.decorators;
 
 import at.aau.serg.cli.Configurations;
-import at.aau.serg.javaparser.MethodNotFoundException;
 import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.MarkedMethod;
 import at.aau.serg.utils.TypeAdapter;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import sootup.core.jimple.basic.Immediate;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
-import sootup.core.jimple.common.stmt.JInvokeStmt;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.model.MethodModifier;
 import sootup.core.signatures.MethodSignature;

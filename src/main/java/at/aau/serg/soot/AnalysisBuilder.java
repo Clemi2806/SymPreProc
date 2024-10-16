@@ -7,7 +7,7 @@ public class AnalysisBuilder {
 
     public AnalysisBuilder(Analysis analysis) {
         this.analysis = analysis;
-    };
+    }
 
     public Analysis build() {
         return analysis;

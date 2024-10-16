@@ -3,7 +3,7 @@ package at.aau.serg.javaparser;
 import java.util.*;
 
 public class ReturnValues implements Iterable<Object>{
-    private List<Object> values;
+    private final List<Object> values;
 
     public ReturnValues() {
         this.values = new ArrayList<>();

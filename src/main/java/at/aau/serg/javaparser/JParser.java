@@ -15,9 +15,6 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.github.javaparser.ast.type.PrimitiveType;
-import com.github.javaparser.resolution.types.ResolvedType;
-import sootup.core.types.Type;
 import sootup.core.types.VoidType;
 
 import java.io.*;
@@ -30,8 +27,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class JParser {
-    private CompilationUnit compilationUnit;
-    private MethodDeclaration method;
+    private final CompilationUnit compilationUnit;
+    private final MethodDeclaration method;
 
     public JParser(String sourcePath, String className, String methodName) throws IOException, MethodNotFoundException {
         String pathToClass = className.replaceAll("\\.", "/");

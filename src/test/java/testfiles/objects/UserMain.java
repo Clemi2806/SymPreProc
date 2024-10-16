@@ -2,8 +2,7 @@ package testfiles.objects;
 
 public class UserMain {
     public static void main(String[] args) {
-        User user = new User("", 0);
-        snippet(user);
+        snippet(null);
     }
 
     public static void snippet(User user) {

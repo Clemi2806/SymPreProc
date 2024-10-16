@@ -11,9 +11,7 @@ public class A {
 
         int z = B.y;
 
-        if(x>5) {
-            assert a > 10;
-        }
+        assert x <= 5 || a > 10;
 
         return x+1;
     }

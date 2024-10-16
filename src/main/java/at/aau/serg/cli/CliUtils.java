@@ -1,7 +1,6 @@
 package at.aau.serg.cli;
 
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 public class CliUtils {

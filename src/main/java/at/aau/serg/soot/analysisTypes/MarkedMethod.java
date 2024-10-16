@@ -1,17 +1,16 @@
 package at.aau.serg.soot.analysisTypes;
 
 import at.aau.serg.utils.TypeAdapter;
-import sootup.core.types.Type;
 
 import java.util.List;
 import java.util.Objects;
 
 public class MarkedMethod extends AnalysisResult {
-    private String className;
-    private String methodName;
-    private TypeAdapter returnType;
-    private List<TypeAdapter> parameterTypes;
-    private boolean hasVarArgs;
+    private final String className;
+    private final String methodName;
+    private final TypeAdapter returnType;
+    private final List<TypeAdapter> parameterTypes;
+    private final boolean hasVarArgs;
 
     public MarkedMethod(String className, String methodName, TypeAdapter returnType, List<TypeAdapter> parameterTypes) {
         this.className = className;

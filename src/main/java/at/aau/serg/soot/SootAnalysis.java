@@ -1,28 +1,20 @@
 package at.aau.serg.soot;
 
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
-import at.aau.serg.soot.analysisTypes.StaticMethodCall;
-import at.aau.serg.soot.analysisTypes.StaticVariableReference;
 import sootup.callgraph.CallGraph;
 import sootup.callgraph.CallGraphAlgorithm;
 import sootup.callgraph.ClassHierarchyAnalysisAlgorithm;
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
-import sootup.core.jimple.common.ref.JFieldRef;
-import sootup.core.jimple.common.ref.JStaticFieldRef;
-import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.MethodSignature;
-import sootup.core.types.PrimitiveType;
 import sootup.java.bytecode.inputlocation.DefaultRTJarAnalysisInputLocation;
 import sootup.java.bytecode.inputlocation.JavaClassPathAnalysisInputLocation;
 import sootup.java.core.JavaSootClass;
-import sootup.java.core.JavaSootField;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 import sootup.java.core.views.JavaView;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SootAnalysis implements Analysis{
     private final JavaView view;

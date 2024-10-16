@@ -1,16 +1,15 @@
 package at.aau.serg.soot.analysisTypes;
 
 import at.aau.serg.utils.TypeAdapter;
-import sootup.core.types.Type;
 
 import java.util.Objects;
 
 public class ObjectFieldReference extends AnalysisResult{
-    private String className;
-    private String objectName;
-    private String fieldName;
-    private TypeAdapter type;
-    private ReferenceType referenceType;
+    private final String className;
+    private final String objectName;
+    private final String fieldName;
+    private final TypeAdapter type;
+    private final ReferenceType referenceType;
 
     public ObjectFieldReference(String className, String objectName, String fieldName, TypeAdapter type, ReferenceType referenceType) {
         this.className = className;

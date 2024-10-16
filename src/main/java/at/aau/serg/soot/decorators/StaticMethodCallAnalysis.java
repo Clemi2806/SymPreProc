@@ -5,7 +5,6 @@ import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.StaticMethodCall;
 import at.aau.serg.utils.TypeAdapter;
 import sootup.core.signatures.MethodSignature;
-import sootup.core.types.PrimitiveType;
 import sootup.java.core.JavaSootMethod;
 
 import java.util.*;
@@ -34,11 +33,11 @@ public class StaticMethodCallAnalysis extends AnalysisDecorator{
     private Set<StaticMethodCall> getStaticMethodCalls() {
         Predicate<JavaSootMethod> isStatic = method -> method.isStatic() && !method.getName().startsWith("<");
         Predicate<JavaSootMethod> isUsableType = method -> isValidType(method.getReturnType());
-        Predicate<JavaSootMethod> isNotMethodOfExcludedScope = method ->  EXCLUDED_SCOPES.stream().noneMatch(s -> method.getDeclaringClassType().getFullyQualifiedName().toString().startsWith(s));
+        Predicate<JavaSootMethod> isNotMethodOfExcludedScope = method ->  EXCLUDED_SCOPES.stream().noneMatch(s -> method.getDeclaringClassType().getFullyQualifiedName().startsWith(s));
         Predicate<JavaSootMethod> isNotMethodOfSameClass = method -> !method.getDeclaringClassType().equals(getMethod().getDeclaringClassType());
 
         Function<MethodSignature, JavaSootMethod> getSootMethodUsingSignature = signature -> getView().getMethod(signature).orElseThrow(() ->  new RuntimeException("Method " + signature.getName() + " not found"));
-        Function<JavaSootMethod, StaticMethodCall> convertToStaticMethodCall = method -> new StaticMethodCall(method.getDeclaringClassType().getClassName(), method.getName(),new TypeAdapter((PrimitiveType) method.getReturnType()));
+        Function<JavaSootMethod, StaticMethodCall> convertToStaticMethodCall = method -> new StaticMethodCall(method.getDeclaringClassType().getClassName(), method.getName(),new TypeAdapter(method.getReturnType()));
 
         return getCallGraph().callsFrom(getMethod().getSignature()).stream()
                 .map(getSootMethodUsingSignature)

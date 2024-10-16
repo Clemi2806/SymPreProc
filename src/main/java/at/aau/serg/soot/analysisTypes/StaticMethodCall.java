@@ -1,15 +1,13 @@
 package at.aau.serg.soot.analysisTypes;
 
 import at.aau.serg.utils.TypeAdapter;
-import com.github.javaparser.ast.type.Type;
-import sootup.core.types.PrimitiveType;
 
 import java.util.Objects;
 
 public class StaticMethodCall extends AnalysisResult{
-    private String methodName;
-    private TypeAdapter returnType;
-    private String className;
+    private final String methodName;
+    private final TypeAdapter returnType;
+    private final String className;
 
     public StaticMethodCall(String className, String methodName, TypeAdapter returnType) {
         this.className = className;

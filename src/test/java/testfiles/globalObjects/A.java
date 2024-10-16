@@ -4,7 +4,7 @@ package testfiles.globalObjects;
 import java.util.Random;
 
 public class A {
-    private B b;
+    private final B b;
 
     public static void main(String[] args) {
         B b = new B();
@@ -24,9 +24,7 @@ public class A {
             return 0;
         }
 
-        if(a + x > 50) {
-            assert false;
-        }
+        assert a + x <= 50;
 
         return a + x;
     }
