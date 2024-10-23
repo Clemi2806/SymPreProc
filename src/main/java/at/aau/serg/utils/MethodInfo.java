@@ -50,6 +50,6 @@ public class MethodInfo {
     }
 
     public String getJavaFilePath() {
-        return sourcePath+ (sourcePath.endsWith("/") ? "" : "/") + getFullyQualifiedClassName().replace(".", "/") + ".java";
+        return sourcePath+ "/" + getFullyQualifiedClassName().replace(".", "/") + ".java";
     }
 }
