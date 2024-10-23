@@ -8,6 +8,7 @@ import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.AnalysisBuilder;
 import at.aau.serg.soot.SootAnalysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
+import at.aau.serg.utils.MethodInfo;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
@@ -65,11 +66,10 @@ public class Main {
             }
         }
 
-        String methodName = methodSpecifier.substring(methodSpecifier.lastIndexOf(".")+1);
-        String className = methodSpecifier.substring(0, methodSpecifier.lastIndexOf("."));
+        MethodInfo methodInfo = new MethodInfo(sourcePath, classPath, methodSpecifier);
 
         System.out.println("----- Starting analysis -----");
-        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(classPath, className, methodName));
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(methodInfo));
         Analysis analysis = analysisBuilder.fullAnalysis();
 
         Set<AnalysisResult> resultSet = analysis.analyse();
@@ -79,7 +79,7 @@ public class Main {
 
         JParser jParser;
         try {
-            jParser = new JParser(sourcePath, className, methodName);
+            jParser = new JParser(methodInfo);
         } catch (IOException | MethodNotFoundException e) {
             throw new RuntimeException(e);
         }

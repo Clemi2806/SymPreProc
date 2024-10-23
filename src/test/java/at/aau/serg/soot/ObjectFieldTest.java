@@ -3,6 +3,7 @@ package at.aau.serg.soot;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.ObjectFieldReference;
 import at.aau.serg.soot.analysisTypes.ReferenceType;
+import at.aau.serg.utils.MethodInfo;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -14,7 +15,8 @@ public class ObjectFieldTest {
 
     @Test
     public void testObjectFieldWrite() {
-        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.objects.A", "snippet"));
+        MethodInfo methodInfo = new MethodInfo("", CLASS_PATH, "testfiles.objects.A.snippet");
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(methodInfo));
         Analysis analysis = analysisBuilder.objectFieldWrite().build();
 
         Set<AnalysisResult> results = analysis.analyse();
@@ -27,7 +29,8 @@ public class ObjectFieldTest {
 
     @Test
     public void testObjectFieldRead() {
-        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.objects.A", "snippet"));
+        MethodInfo methodInfo = new MethodInfo("", CLASS_PATH, "testfiles.objects.A.snippet");
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(methodInfo));
         Analysis analysis = analysisBuilder.objectFieldRead().build();
 
         Set<AnalysisResult> results = analysis.analyse();

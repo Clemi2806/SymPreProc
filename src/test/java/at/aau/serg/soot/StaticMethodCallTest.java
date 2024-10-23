@@ -3,6 +3,7 @@ package at.aau.serg.soot;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.StaticMethodCall;
 import at.aau.serg.soot.decorators.StaticMethodCallAnalysis;
+import at.aau.serg.utils.MethodInfo;
 import at.aau.serg.utils.TypeAdapter;
 import org.junit.jupiter.api.Test;
 import sootup.core.types.PrimitiveType;
@@ -19,7 +20,7 @@ public class StaticMethodCallTest {
 
     @Test
     public void testStaticMethodCalls() {
-        SootAnalysis sootAnalysis = new SootAnalysis(CLASS_PATH, CLASS_IDENTIFIER, METHOD_NAME);
+        SootAnalysis sootAnalysis = new SootAnalysis(new MethodInfo("", CLASS_PATH, CLASS_IDENTIFIER+ "." + METHOD_NAME));
 
         Set<AnalysisResult> calls = new StaticMethodCallAnalysis(sootAnalysis).analyse();
 

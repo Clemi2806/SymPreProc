@@ -1,6 +1,7 @@
 package at.aau.serg.javaparser;
 
 import at.aau.serg.soot.analysisTypes.*;
+import at.aau.serg.utils.MethodInfo;
 import at.aau.serg.utils.TypeAdapter;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -29,23 +30,18 @@ public class JParser {
     private final CompilationUnit compilationUnit;
     private final MethodDeclaration method;
 
-    public JParser(String sourcePath, String className, String methodName) throws IOException, MethodNotFoundException {
-        String pathToClass = className.replaceAll("\\.", "/");
-        if (!sourcePath.endsWith("/")) sourcePath += "/";
+    public JParser(final MethodInfo methodInfo) throws IOException, MethodNotFoundException {
+        File file = new File(methodInfo.getJavaFilePath());
 
-        String fullySpecifiedFilePath = sourcePath + pathToClass + ".java";
-
-        File file = new File(fullySpecifiedFilePath);
-
-        if(!file.exists()) throw new FileNotFoundException("File not found at: " + fullySpecifiedFilePath);
+        if(!file.exists()) throw new FileNotFoundException("File not found at: " + methodInfo.getJavaFilePath());
 
         compilationUnit = StaticJavaParser.parse(Files.newInputStream(file.toPath()));
 
         method = compilationUnit
                 .findAll(MethodDeclaration.class)
-                .stream().filter(md -> md.getNameAsString().equals(methodName))
+                .stream().filter(md -> md.getNameAsString().equals(methodInfo.getMethodName()))
                 .findFirst()
-                .orElseThrow(() -> new MethodNotFoundException("Method not found: " + methodName));
+                .orElseThrow(() -> new MethodNotFoundException("Method not found: " + methodInfo.getMethodName()));
 
     }
 

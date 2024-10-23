@@ -1,6 +1,7 @@
 package at.aau.serg.soot;
 
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
+import at.aau.serg.utils.MethodInfo;
 import sootup.callgraph.CallGraph;
 import sootup.callgraph.CallGraphAlgorithm;
 import sootup.callgraph.ClassHierarchyAnalysisAlgorithm;
@@ -22,20 +23,20 @@ public class SootAnalysis implements Analysis{
     private final CallGraph callGraph;
     private final StmtGraph<?> stmtGraph;
 
-    public SootAnalysis(String classPath, String classIdentifier, String methodName) {
+    public SootAnalysis(final MethodInfo methodInfo) {
         List<AnalysisInputLocation> inputLocations = new ArrayList<>();
-        inputLocations.add(new JavaClassPathAnalysisInputLocation(classPath));
+        inputLocations.add(new JavaClassPathAnalysisInputLocation(methodInfo.getClassPath()));
         inputLocations.add(new DefaultRTJarAnalysisInputLocation());
         view = new JavaView(inputLocations);
 
-        JavaClassType classType = view.getIdentifierFactory().getClassType(classIdentifier);
+        JavaClassType classType = view.getIdentifierFactory().getClassType(methodInfo.getFullyQualifiedClassName());
         Optional<JavaSootClass> class_ = view.getClass(classType);
         if (!class_.isPresent()) {
-            throw new RuntimeException("Could not find class " + classIdentifier);
+            throw new RuntimeException("Could not find class " + methodInfo.getFullyQualifiedClassName());
         }
         // TODO: Specify method using full signature, to filter out overloaded methods
-        System.out.printf("Selecting first method with name: %s%n", methodName);
-        javaSootMethod = (JavaSootMethod) class_.get().getMethodsByName(methodName).toArray()[0];
+        System.out.printf("Selecting first method with name: %s%n", methodInfo.getMethodName());
+        javaSootMethod = (JavaSootMethod) class_.get().getMethodsByName(methodInfo.getMethodName()).toArray()[0];
 
         callGraph = createCallGraph();
 

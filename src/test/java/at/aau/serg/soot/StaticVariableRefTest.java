@@ -4,6 +4,7 @@ import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.ReferenceType;
 import at.aau.serg.soot.analysisTypes.StaticVariableReference;
 import at.aau.serg.soot.decorators.StaticVariableReferenceAnalysis;
+import at.aau.serg.utils.MethodInfo;
 import at.aau.serg.utils.TypeAdapter;
 import org.junit.jupiter.api.Test;
 import sootup.core.types.PrimitiveType;
@@ -20,7 +21,8 @@ public class StaticVariableRefTest {
 
     @Test
     public void testStaticVariableReferences() {
-        SootAnalysis sootAnalysis = new SootAnalysis(CLASS_PATH, CLASS_IDENTIFIER, METHOD_NAME);
+        MethodInfo methodInfo = new MethodInfo("", CLASS_PATH, CLASS_IDENTIFIER + "." + METHOD_NAME);
+        SootAnalysis sootAnalysis = new SootAnalysis(methodInfo);
 
         Set<AnalysisResult> references = new StaticVariableReferenceAnalysis(sootAnalysis).analyse();
 
@@ -33,7 +35,8 @@ public class StaticVariableRefTest {
 
     @Test
     public void testStaticVariableWrite() {
-        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.staticVars.A", "snippet"));
+        MethodInfo methodInfo = new MethodInfo("", CLASS_PATH, "testfiles.staticVars.A.snippet");
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(methodInfo));
         Analysis analysis = analysisBuilder.staticVariableWrite().build();
 
         Set<AnalysisResult> results = analysis.analyse();
@@ -44,7 +47,8 @@ public class StaticVariableRefTest {
 
     @Test
     public void testNoStaticVariableWrite() {
-        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.staticVars.NoStaticWrite", "snippet"));
+        MethodInfo methodInfo = new MethodInfo("", CLASS_PATH, "testfiles.staticVars.NoStaticWrite.snippet");
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(methodInfo));
         Analysis analysis = analysisBuilder.staticVariableWrite().build();
 
         Set<AnalysisResult> results = analysis.analyse();

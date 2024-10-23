@@ -3,6 +3,7 @@ package at.aau.serg.soot;
 import at.aau.serg.cli.Configurations;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import at.aau.serg.soot.analysisTypes.MarkedMethod;
+import at.aau.serg.utils.MethodInfo;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
@@ -15,7 +16,8 @@ import static org.mockito.Mockito.*;
 public class MarkedMethodsTest {
     @Test
     public void markedMethodsTest() {
-        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.markedMethods.MM", "snippet"));
+        MethodInfo info = new MethodInfo("", CLASS_PATH, "testfiles.markedMethods.MM.snippet");
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(info));
         Analysis analysis = analysisBuilder.markedMethodCall().build();
 
         try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
@@ -38,7 +40,8 @@ public class MarkedMethodsTest {
 
     @Test
     public void markedMethodsMultipleArgsTest() {
-        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.markedMethods.MultipleArgs", "snippet"));
+        MethodInfo info = new MethodInfo("", CLASS_PATH, "testfiles.markedMethods.MultipleArgs.snippet");
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(info));
         Analysis analysis = analysisBuilder.markedMethodCall().build();
 
         try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
@@ -62,7 +65,8 @@ public class MarkedMethodsTest {
 
     @Test
     public void markedMethodsObjectMethodTest() {
-        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.markedMethods.ObjectMethod", "snippet"));
+        MethodInfo info = new MethodInfo("", CLASS_PATH, "testfiles.markedMethods.ObjectMethod.snippet");
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(info));
         Analysis analysis = analysisBuilder.markedMethodCall().build();
 
         try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
@@ -85,7 +89,8 @@ public class MarkedMethodsTest {
 
     @Test
     public void markedClassesTest() {
-        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(CLASS_PATH, "testfiles.objects.UserMain", "snippet"));
+        MethodInfo info = new MethodInfo("", CLASS_PATH, "testfiles.objects.UserMain.snippet");
+        AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(info));
         Analysis analysis = analysisBuilder.markedMethodCall().build();
 
         try (MockedStatic<Configurations> configurationsClassMock = mockStatic(Configurations.class)) {
