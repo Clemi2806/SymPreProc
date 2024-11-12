@@ -108,9 +108,8 @@ public class JParser {
         }
 
         // Clean up and remove unused method parameters
-        Predicate<Parameter> isUsed = p -> !method.findAll(NameExpr.class,n -> n.getNameAsString().equals(p.getNameAsString())).isEmpty();
-
-        method.getParameters().removeIf(isUsed.negate());
+        MethodCleaner methodCleaner = new MethodCleaner();
+        methodCleaner.removeUnusedParameters(method);
         System.out.println("----- Finished parsing -----");
     }
 
