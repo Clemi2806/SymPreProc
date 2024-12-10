@@ -70,7 +70,11 @@ public class Main {
 
         System.out.println("----- Starting analysis -----");
         AnalysisBuilder analysisBuilder = new AnalysisBuilder(new SootAnalysis(methodInfo));
-        Analysis analysis = analysisBuilder.fullAnalysis();
+        //Analysis analysis = analysisBuilder.fullAnalysis();
+
+        analysisBuilder = configureAnalysis(cmd, analysisBuilder);
+
+        Analysis analysis = analysisBuilder.build();
 
         Set<AnalysisResult> resultSet = analysis.analyse();
 
@@ -91,5 +95,27 @@ public class Main {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    protected static AnalysisBuilder configureAnalysis(CommandLine cmd, AnalysisBuilder analysisBuilder) {
+        if(!cmd.hasOption("1")) {
+            analysisBuilder = analysisBuilder.staticMethodCall();
+        }
+        if(!cmd.hasOption("2")) {
+            analysisBuilder = analysisBuilder.staticVariableRef();
+        }
+        if(!cmd.hasOption("3")) {
+            analysisBuilder = analysisBuilder.staticVariableWrite();
+        }
+        if(!cmd.hasOption("4")) {
+            analysisBuilder = analysisBuilder.objectFieldWrite();
+        }
+        if(!cmd.hasOption("5")) {
+            analysisBuilder = analysisBuilder.objectFieldRead();
+        }
+        if(!cmd.hasOption("6")) {
+            analysisBuilder = analysisBuilder.markedMethodCall();
+        }
+        return analysisBuilder;
     }
 }

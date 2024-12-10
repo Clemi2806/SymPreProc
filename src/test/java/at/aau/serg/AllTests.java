@@ -9,6 +9,6 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 
 @Suite
 @SuiteDisplayName("All tests")
-@SelectClasses({ConfigurationsTest.class, JParserTests.class, SootAnalysisTests.class, UtilsTests.class})
+@SelectClasses({ConfigurationsTest.class, JParserTests.class, SootAnalysisTests.class, UtilsTests.class, DisableAnalysisTest.class})
 public class AllTests {
 }
