@@ -1,0 +1,9 @@
+classpath=/Users/clemens/Documents/Uni/Master/Master_Project/SymPreProc/target/test-classes
+
+target=testfiles.report.Main
+
+symbolic.method=testfiles.report.Main.validateUser(sym)
+
+symbolic.dp=coral
+
+listener=.symbc.SymbolicListener

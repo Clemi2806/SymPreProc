@@ -32,7 +32,7 @@ public class StaticVariableWriteAnalysis extends AnalysisDecorator {
         return results;
     }
 
-    private Set<StaticVariableReference> getStaticVariableWrites() {
+    private Set<AnalysisResult> getStaticVariableWrites() {
         Function<FieldSignature, StaticVariableReference> convertToStaticVariableWrite = fs -> new StaticVariableReference(fs.getDeclClassType().getClassName(),fs.getName(), new TypeAdapter(fs.getType()), ReferenceType.WRITE);
 
         Predicate<JStaticFieldRef> isParsable = fr -> isValidType(fr.getType());

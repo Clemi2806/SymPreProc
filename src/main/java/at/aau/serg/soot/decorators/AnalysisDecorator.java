@@ -4,6 +4,9 @@ import at.aau.serg.soot.Analysis;
 import at.aau.serg.soot.analysisTypes.AnalysisResult;
 import sootup.callgraph.CallGraph;
 import sootup.core.graph.StmtGraph;
+import sootup.core.jimple.common.ref.JFieldRef;
+import sootup.core.jimple.common.ref.JInstanceFieldRef;
+import sootup.core.jimple.common.stmt.JAssignStmt;
 import sootup.core.types.Type;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.views.JavaView;
@@ -57,5 +60,14 @@ public abstract class AnalysisDecorator implements Analysis {
             default:
                 return false;
         }
+    }
+
+    protected String getNameOfObject(JInstanceFieldRef instanceFieldRef) {
+        return ((JFieldRef) getStmtGraph().getStmts().stream()
+                .filter(JAssignStmt.class::isInstance).map(JAssignStmt.class::cast)
+                .filter(s -> s.getLeftOp().equals(instanceFieldRef.getBase()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Could not find name of the object"))
+                .getRightOp()).getFieldSignature().getName();
     }
 }

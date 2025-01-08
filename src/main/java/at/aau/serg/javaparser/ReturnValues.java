@@ -26,6 +26,13 @@ public class ReturnValues implements Iterable<Object>{
     }
 
     @Override
+    public String toString() {
+        return "ReturnValues{" +
+                "values=" + values +
+                '}';
+    }
+
+    @Override
     public Iterator<Object> iterator() {
         return values.iterator();
     }

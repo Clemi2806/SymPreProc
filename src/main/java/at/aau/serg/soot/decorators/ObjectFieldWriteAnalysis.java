@@ -59,13 +59,4 @@ public class ObjectFieldWriteAnalysis extends AnalysisDecorator {
                 .map(mapToObjectFieldRef)
                 .collect(Collectors.toSet());
     }
-
-    private String getNameOfObject(JInstanceFieldRef instanceFieldRef) {
-        return ((JFieldRef) getStmtGraph().getStmts().stream()
-                .filter(JAssignStmt.class::isInstance).map(JAssignStmt.class::cast)
-                .filter(s -> s.getLeftOp().equals(instanceFieldRef.getBase()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Could not find name of object"))
-                .getRightOp()).getFieldSignature().getName();
-    }
 }

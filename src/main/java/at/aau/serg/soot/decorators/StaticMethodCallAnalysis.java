@@ -30,7 +30,7 @@ public class StaticMethodCallAnalysis extends AnalysisDecorator{
         return results;
     }
 
-    private Set<StaticMethodCall> getStaticMethodCalls() {
+    private Set<AnalysisResult> getStaticMethodCalls() {
         Predicate<JavaSootMethod> isStatic = method -> method.isStatic() && !method.getName().startsWith("<");
         Predicate<JavaSootMethod> isUsableType = method -> isValidType(method.getReturnType());
         Predicate<JavaSootMethod> isNotMethodOfExcludedScope = method ->  EXCLUDED_SCOPES.stream().noneMatch(s -> method.getDeclaringClassType().getFullyQualifiedName().startsWith(s));

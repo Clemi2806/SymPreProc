@@ -123,7 +123,7 @@ public class JParser {
             processMethodArguments(m, mc, counter);
 
             if(!(m.getReturnType().asSootType() instanceof VoidType)) {
-                Parameter newParam = new Parameter(m.getReturnType().asJavaParserType(), m.getNewVariableName() + "_ret");
+                Parameter newParam = new Parameter(m.getReturnType().asJavaParserType(), m.getNewVariableName() + "_ret" + counter.get());
                 if(method.getParameters().stream().noneMatch(p -> p.equals(newParam))) {
                     method.addParameter(newParam);
                 }
@@ -267,7 +267,7 @@ public class JParser {
             }
         });
 
-        changeMethodCalls();
+        //changeMethodCalls();
     }
 
     private void parseStaticMethodCall(StaticMethodCall staticMethodCall) {
@@ -283,7 +283,7 @@ public class JParser {
             }
         });
         // TODO: Refactor this
-        changeMethodCalls();
+        //changeMethodCalls();
     }
 
     private void changeMethodCalls() {

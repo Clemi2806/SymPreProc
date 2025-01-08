@@ -20,7 +20,10 @@ public class RunTestCases {
 
     public static Stream<Arguments> configurationSupplier() {
         return Stream.of(
-    Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/PF.java --method testfiles.markedMethods.PrintfMethod.snippet --config src/test/resources/printfConfig.cfg"),
+                Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/ValUser.java --method testfiles.report.Main.validateUser --config src/test/resources/report_example.cfg"),
+                Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/MMWRT.java --method testfiles.markedMethods.MMWithRet.snippet --config src/test/resources/MMWithRet.cfg"),
+                Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/NSW.java --method testfiles.staticVars.NoStaticWrite.snippet"),
+            Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/PF.java --method testfiles.markedMethods.PrintfMethod.snippet --config src/test/resources/printfConfig.cfg"),
             Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/Object.java --method testfiles.objects.A.snippet"),
             Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/MM_MA.java --method testfiles.markedMethods.MultipleArgs.snippet --config src/test/resources/markedMethodsExample.cfg"),
             Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/UserMain.java --method testfiles.objects.UserMain.snippet --config src/test/resources/exampleUser.cfg"),

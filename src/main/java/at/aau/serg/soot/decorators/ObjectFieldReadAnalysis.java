@@ -6,9 +6,7 @@ import at.aau.serg.soot.analysisTypes.ObjectFieldReference;
 import at.aau.serg.soot.analysisTypes.ReferenceType;
 import at.aau.serg.utils.TypeAdapter;
 import sootup.core.jimple.common.expr.JSpecialInvokeExpr;
-import sootup.core.jimple.common.ref.JFieldRef;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
-import sootup.core.jimple.common.stmt.JAssignStmt;
 import sootup.core.jimple.common.stmt.JInvokeStmt;
 import sootup.core.jimple.common.stmt.Stmt;
 
@@ -58,12 +56,4 @@ public class ObjectFieldReadAnalysis extends AnalysisDecorator{
 
     }
 
-    private String getNameOfObject(JInstanceFieldRef instanceFieldRef) {
-        return ((JFieldRef) getStmtGraph().getStmts().stream()
-                .filter(JAssignStmt.class::isInstance).map(JAssignStmt.class::cast)
-                .filter(s -> s.getLeftOp().equals(instanceFieldRef.getBase()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Could not find name of the object"))
-                .getRightOp()).getFieldSignature().getName();
-    }
 }

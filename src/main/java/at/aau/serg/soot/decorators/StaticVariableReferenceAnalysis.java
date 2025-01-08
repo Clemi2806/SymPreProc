@@ -33,7 +33,7 @@ public class StaticVariableReferenceAnalysis extends AnalysisDecorator{
         return results;
     }
 
-    public Set<StaticVariableReference> getStaticVariableReferences() {
+    private Set<AnalysisResult> getStaticVariableReferences() {
         Predicate<JFieldRef> isNotFinal = sfr -> {
             Optional<JavaSootField> field = getView().getField(sfr.getFieldSignature());
             if (!field.isPresent()) return false;
