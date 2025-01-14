@@ -334,7 +334,9 @@ public class JParser {
                     ObjectCreationExpr objectCreationExpr = new ObjectCreationExpr(old.getScope().orElse(null), old.getType(), args);
                     old.replace(objectCreationExpr);
                 } else {
-                    returnStmt.setExpression(createObjectCreationExpr(exp, new NameExpr(newVariableName)));
+                    returnStmt.removeExpression();
+                    ObjectCreationExpr newObj = createObjectCreationExpr(exp, new NameExpr(newVariableName));
+                    returnStmt.setExpression(newObj);
                 }
             } else {
                 returnStmt.setExpression(createObjectCreationExpr(new NameExpr(newVariableName)));
@@ -348,7 +350,9 @@ public class JParser {
     }
 
     private ObjectCreationExpr createObjectCreationExpr(Expression... expressions) {
-        return new ObjectCreationExpr(null, StaticJavaParser.parseClassOrInterfaceType("ReturnValues"),new NodeList<>(expressions));
+        ObjectCreationExpr objectCreationExpr =  new ObjectCreationExpr(null, StaticJavaParser.parseClassOrInterfaceType("ReturnValues"),new NodeList<>(expressions));
+
+        return objectCreationExpr;
     }
 
     protected static Expression convertParameter(Parameter parameter) {

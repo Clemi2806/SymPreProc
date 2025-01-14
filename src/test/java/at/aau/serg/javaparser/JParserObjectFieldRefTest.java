@@ -1,0 +1,68 @@
+package at.aau.serg.javaparser;
+
+import at.aau.serg.soot.analysisTypes.AnalysisResult;
+import at.aau.serg.soot.analysisTypes.ObjectFieldReference;
+import at.aau.serg.soot.analysisTypes.ReferenceType;
+import at.aau.serg.soot.analysisTypes.StaticVariableReference;
+import at.aau.serg.utils.MethodInfo;
+import at.aau.serg.utils.TypeAdapter;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.stmt.ReturnStmt;
+import org.junit.jupiter.api.Test;
+import sootup.core.types.PrimitiveType;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class JParserObjectFieldRefTest {
+    @Test
+    public void staticVarWriteTest() {
+        MethodInfo info = new MethodInfo("src/test/resources/javaparser", "", "ObjectFieldReferenceWrite.snippet");
+        JParser parser = assertDoesNotThrow(() -> new JParser(info));
+        Set<AnalysisResult> results = new HashSet<>();
+
+        results.add(new ObjectFieldReference("B", "b","y", new TypeAdapter(PrimitiveType.getInt()), ReferenceType.WRITE));
+
+        assertDoesNotThrow(() -> parser.parse(results));
+
+        MethodDeclaration method = parser.getMethod();
+
+        assertEquals(2, method.getParameters().size());
+        assertEquals("ReturnValues", method.getType().asClassOrInterfaceType().getNameAsString());
+
+        boolean checkReturnStmts = method.findAll(ReturnStmt.class).stream().allMatch(stmt -> {
+            if(!stmt.getExpression().isPresent()) return false;
+            ObjectCreationExpr objectCreationExpr = stmt.getExpression().get().asObjectCreationExpr();
+            return objectCreationExpr.getArguments().size() == 1
+                    && objectCreationExpr.getArguments().getFirst().get().isNameExpr()
+                    && objectCreationExpr.getArguments().getFirst().get().asNameExpr().getNameAsString().equals("V_B_b_y");
+        });
+
+        assertTrue(checkReturnStmts);
+        String newParameter = method.getParameter(1).getNameAsString();
+        assertEquals("V_B_b_y", newParameter);
+    }
+
+    @Test
+    public void staticVarReadTest() {
+        MethodInfo info = new MethodInfo("src/test/resources/javaparser","", "ObjectFieldReferenceRead.snippet");
+        JParser parser = assertDoesNotThrow(() -> new JParser(info));
+        Set<AnalysisResult> results = new HashSet<>();
+
+        results.add(new ObjectFieldReference("B", "b","y", new TypeAdapter(PrimitiveType.getInt()), ReferenceType.READ));
+
+        assertDoesNotThrow(() -> parser.parse(results));
+
+        MethodDeclaration method = parser.getMethod();
+
+        assertEquals("int", method.getType().asString());
+        assertEquals(1, method.getParameters().size());
+        assertEquals("V_B_b_y", method.getParameter(0).getNameAsString());
+        assertEquals(1, method.getBody().get().findAll(NameExpr.class).stream().filter(s -> s.getNameAsString().equals("V_B_b_y")).count());
+    }
+}

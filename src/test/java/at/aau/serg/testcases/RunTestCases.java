@@ -20,6 +20,7 @@ public class RunTestCases {
 
     public static Stream<Arguments> configurationSupplier() {
         return Stream.of(
+                Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/MMC.java --method testfiles.markedMethods.MarkedMethodCall.snippet --config src/test/resources/javaparser/mmc.cfg"),
                 Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/ValUser.java --method testfiles.report.Main.validateUser --config src/test/resources/report_example.cfg"),
                 Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/MMWRT.java --method testfiles.markedMethods.MMWithRet.snippet --config src/test/resources/MMWithRet.cfg"),
                 Arguments.of("--sourcepath src/test/java/ --classpath target/test-classes/ --output target/NSW.java --method testfiles.staticVars.NoStaticWrite.snippet"),
