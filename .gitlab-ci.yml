@@ -8,7 +8,7 @@ build-project:
     - "mvn clean package"
   artifacts:
     paths:
-      - "/target/SymPreProc-1.0-SNAPSHOT-jar-with-dependencies.jar"
+      - "target/SymPreProc-1.0-SNAPSHOT-jar-with-dependencies.jar"
   tags:
     - "maven"
     - "java"
