@@ -1,0 +1,13 @@
+stages:
+  - build
+
+build-project:
+  image: "maven:3.9.9-eclipse-temurin-8"
+  script:
+    - "mvn clean package"
+  artifacts:
+    paths:
+      - "/target/SymPreProc-1.0-SNAPSHOT-jar-with-dependencies.jar"
+  tags:
+    - "maven"
+    - "java"
